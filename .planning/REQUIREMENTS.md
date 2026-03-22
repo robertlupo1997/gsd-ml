@@ -9,7 +9,7 @@
 
 - [x] **PKG-01**: npm package installs skills into ~/.claude/commands/gsd-ml/
 - [x] **PKG-02**: npm package installs workflows, references, templates into ~/.claude/gsd-ml/
-- [ ] **PKG-03**: Python package (gsd_ml) installable via pip/uv with ML utilities
+- [x] **PKG-03**: Python package (gsd_ml) installable via pip/uv with ML utilities
 - [x] **PKG-04**: Installer validates Python package works after install
 
 ### Dataset Profiling
@@ -125,7 +125,7 @@
 |-------------|-------|--------|
 | PKG-01 | Phase 1 | Complete |
 | PKG-02 | Phase 1 | Complete |
-| PKG-03 | Phase 1 | Pending |
+| PKG-03 | Phase 1 | Complete |
 | PKG-04 | Phase 1 | Complete |
 | PROF-01 | Phase 2 | Pending |
 | PROF-02 | Phase 2 | Pending |
