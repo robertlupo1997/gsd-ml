@@ -25,7 +25,13 @@ Build gsd-ml as a Claude Code native ML research tool following GSD patterns. St
   3. `python -c "from gsd_ml.profiler import profile_dataset"` works
   4. `python -c "from gsd_ml.guardrails import check_guardrails"` works
   5. All ported Python utilities pass tests
-**Plans**: TBD
+**Plans:** 4 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Python package scaffold + port 11 root-level modules
+- [ ] 01-02-PLAN.md — npm package skeleton (install.js, stub skill/workflow files)
+- [ ] 01-03-PLAN.md — Python subpackages (baselines, prepare) + de-Jinja2 templates
+- [ ] 01-04-PLAN.md — Test suite + integration validation
 
 ### Phase 2: Core Workflow (Tabular)
 **Goal**: `/gsd:ml dataset.csv target` runs a complete tabular ML experiment end-to-end
@@ -89,7 +95,7 @@ Build gsd-ml as a Claude Code native ML research tool following GSD patterns. St
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/TBD | Not started | - |
+| 1. Foundation | 0/4 | Planned | - |
 | 2. Core Workflow | 0/TBD | Not started | - |
 | 3. Intelligence | 0/TBD | Not started | - |
 | 4. DL + FT | 0/TBD | Not started | - |
