@@ -38,12 +38,16 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. Claude Code profiles a CSV and auto-detects classification vs regression
   2. `.ml/` directory scaffolded with prepare.py, train.py, config.json
-  3. Claude Code iterates: edit train.py → run → parse metric → keep/revert
+  3. Claude Code iterates: edit train.py -> run -> parse metric -> keep/revert
   4. Git branch created, commits on keep, reverts on non-improvement
   5. Guardrails stop the loop when budget exhausted
   6. Best model exported to .ml/artifacts/ with metadata
   7. Retrospective markdown generated
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Static template (train-tabular.py), metric reference, skill file update
+- [ ] 02-02-PLAN.md — Complete ml-run.md workflow (profile, scaffold, loop, finalize)
 
 ### Phase 3: Intelligence Layer
 **Goal**: Smart iteration with diagnostics, stagnation branching, and multi-draft exploration
@@ -94,7 +98,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete | 2026-03-22 |
-| 2. Core Workflow | 0/TBD | Not started | - |
+| 2. Core Workflow | 0/2 | Planned | - |
 | 3. Intelligence | 0/TBD | Not started | - |
 | 4. DL + FT | 0/TBD | Not started | - |
 | 5. Supporting Skills | 0/TBD | Not started | - |
