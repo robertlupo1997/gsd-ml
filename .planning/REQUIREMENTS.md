@@ -15,7 +15,7 @@
 ### Dataset Profiling
 
 - [ ] **PROF-01**: Auto-detect task type (classification vs regression) from target column
-- [ ] **PROF-02**: Auto-select appropriate metric based on task type
+- [x] **PROF-02**: Auto-select appropriate metric based on task type
 - [ ] **PROF-03**: Detect data leakage and warn user
 - [ ] **PROF-04**: Report dataset statistics (rows, features, missing %, types)
 
@@ -23,7 +23,7 @@
 
 - [ ] **SCAF-01**: Create .ml/ state directory with config, checkpoint, journal files
 - [ ] **SCAF-02**: Generate domain-appropriate frozen prepare.py
-- [ ] **SCAF-03**: Generate domain-appropriate starter train.py
+- [x] **SCAF-03**: Generate domain-appropriate starter train.py
 - [ ] **SCAF-04**: Create git branch for experiment run (ml/run-{id})
 
 ### Experiment Loop
@@ -61,9 +61,9 @@
 
 ### Tabular Domain
 
-- [ ] **TAB-01**: sklearn, XGBoost, LightGBM model families supported
-- [ ] **TAB-02**: Metrics: accuracy, f1, f1_weighted, r2, rmse, mae
-- [ ] **TAB-03**: Cross-validation evaluation in train.py
+- [x] **TAB-01**: sklearn, XGBoost, LightGBM model families supported
+- [x] **TAB-02**: Metrics: accuracy, f1, f1_weighted, r2, rmse, mae
+- [x] **TAB-03**: Cross-validation evaluation in train.py
 - [ ] **TAB-04**: Tabular-specific baselines (most_frequent, stratified, mean, median)
 
 ### Deep Learning Domain
@@ -128,12 +128,12 @@
 | PKG-03 | Phase 1 | Complete |
 | PKG-04 | Phase 1 | Complete |
 | PROF-01 | Phase 2 | Pending |
-| PROF-02 | Phase 2 | Pending |
+| PROF-02 | Phase 2 | Complete |
 | PROF-03 | Phase 2 | Pending |
 | PROF-04 | Phase 2 | Pending |
 | SCAF-01 | Phase 2 | Pending |
 | SCAF-02 | Phase 2 | Pending |
-| SCAF-03 | Phase 2 | Pending |
+| SCAF-03 | Phase 2 | Complete |
 | SCAF-04 | Phase 2 | Pending |
 | LOOP-01 | Phase 2 | Pending |
 | LOOP-02 | Phase 2 | Pending |
@@ -156,9 +156,9 @@
 | STATE-02 | Phase 5 | Pending |
 | STATE-03 | Phase 2 | Pending |
 | STATE-04 | Phase 2 | Pending |
-| TAB-01 | Phase 2 | Pending |
-| TAB-02 | Phase 2 | Pending |
-| TAB-03 | Phase 2 | Pending |
+| TAB-01 | Phase 2 | Complete |
+| TAB-02 | Phase 2 | Complete |
+| TAB-03 | Phase 2 | Complete |
 | TAB-04 | Phase 2 | Pending |
 | DL-01 | Phase 4 | Pending |
 | DL-02 | Phase 4 | Pending |
