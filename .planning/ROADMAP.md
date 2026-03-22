@@ -6,7 +6,7 @@ Build gsd-ml as a Claude Code native ML research tool following GSD patterns. St
 
 ## Phases
 
-- [ ] **Phase 1: Foundation** - npm package skeleton + Python utilities ported from mlforge
+- [x] **Phase 1: Foundation** - npm package skeleton + Python utilities ported from mlforge (2026-03-22)
 - [ ] **Phase 2: Core Workflow** - End-to-end tabular experiment loop via Claude Code
 - [ ] **Phase 3: Intelligence Layer** - Diagnostics, stagnation, multi-draft
 - [ ] **Phase 4: DL + Fine-Tuning** - Deep learning and fine-tuning domains
@@ -25,13 +25,11 @@ Build gsd-ml as a Claude Code native ML research tool following GSD patterns. St
   3. `python -c "from gsd_ml.profiler import profile_dataset"` works
   4. `python -c "from gsd_ml.guardrails import check_guardrails"` works
   5. All ported Python utilities pass tests
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 complete
 
 Plans:
-- [ ] 01-01-PLAN.md — Python package scaffold + port 11 root-level modules
-- [ ] 01-02-PLAN.md — npm package skeleton (install.js, stub skill/workflow files)
-- [ ] 01-03-PLAN.md — Python subpackages (baselines, prepare) + de-Jinja2 templates
-- [ ] 01-04-PLAN.md — Test suite + integration validation
+- [x] 01-01-PLAN.md — Port all 17 Python modules + tests (162 passing)
+- [x] 01-02-PLAN.md — npm package skeleton (install.js, stub skill)
 
 ### Phase 2: Core Workflow (Tabular)
 **Goal**: `/gsd:ml dataset.csv target` runs a complete tabular ML experiment end-to-end
@@ -95,7 +93,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 1/2 | In Progress|  |
+| 1. Foundation | 2/2 | Complete | 2026-03-22 |
 | 2. Core Workflow | 0/TBD | Not started | - |
 | 3. Intelligence | 0/TBD | Not started | - |
 | 4. DL + FT | 0/TBD | Not started | - |
