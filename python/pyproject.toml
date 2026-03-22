@@ -1,0 +1,30 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "gsd-ml"
+version = "0.1.0"
+description = "Python ML utilities for gsd-ml"
+requires-python = ">=3.11"
+dependencies = [
+    "scikit-learn>=1.5",
+    "pandas>=2.0",
+    "numpy>=2.0",
+    "xgboost>=2.0",
+    "lightgbm>=4.0",
+    "pyarrow>=15.0",
+]
+
+[project.optional-dependencies]
+dl = ["torch", "timm", "transformers"]
+ft = ["torch", "peft", "trl", "transformers"]
+
+[dependency-groups]
+dev = ["pytest", "ruff"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/gsd_ml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
