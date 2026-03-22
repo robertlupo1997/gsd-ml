@@ -14,33 +14,33 @@
 
 ### Dataset Profiling
 
-- [ ] **PROF-01**: Auto-detect task type (classification vs regression) from target column
+- [x] **PROF-01**: Auto-detect task type (classification vs regression) from target column
 - [x] **PROF-02**: Auto-select appropriate metric based on task type
-- [ ] **PROF-03**: Detect data leakage and warn user
-- [ ] **PROF-04**: Report dataset statistics (rows, features, missing %, types)
+- [x] **PROF-03**: Detect data leakage and warn user
+- [x] **PROF-04**: Report dataset statistics (rows, features, missing %, types)
 
 ### Experiment Scaffolding
 
-- [ ] **SCAF-01**: Create .ml/ state directory with config, checkpoint, journal files
-- [ ] **SCAF-02**: Generate domain-appropriate frozen prepare.py
+- [x] **SCAF-01**: Create .ml/ state directory with config, checkpoint, journal files
+- [x] **SCAF-02**: Generate domain-appropriate frozen prepare.py
 - [x] **SCAF-03**: Generate domain-appropriate starter train.py
-- [ ] **SCAF-04**: Create git branch for experiment run (ml/run-{id})
+- [x] **SCAF-04**: Create git branch for experiment run (ml/run-{id})
 
 ### Experiment Loop
 
-- [ ] **LOOP-01**: Claude Code edits train.py directly (no subprocess spawning)
-- [ ] **LOOP-02**: Claude Code runs train.py via Bash and parses JSON metric from stdout
-- [ ] **LOOP-03**: Keep decision: git commit on improvement
-- [ ] **LOOP-04**: Revert decision: git checkout on non-improvement
-- [ ] **LOOP-05**: Retry decision: re-run with reduced resources on OOM
-- [ ] **LOOP-06**: Stop decision: halt on repeated OOM or guardrail trip
+- [x] **LOOP-01**: Claude Code edits train.py directly (no subprocess spawning)
+- [x] **LOOP-02**: Claude Code runs train.py via Bash and parses JSON metric from stdout
+- [x] **LOOP-03**: Keep decision: git commit on improvement
+- [x] **LOOP-04**: Revert decision: git checkout on non-improvement
+- [x] **LOOP-05**: Retry decision: re-run with reduced resources on OOM
+- [x] **LOOP-06**: Stop decision: halt on repeated OOM or guardrail trip
 
 ### Guardrails
 
-- [ ] **GUARD-01**: Enforce experiment count limit
-- [ ] **GUARD-02**: Enforce time budget (minutes)
-- [ ] **GUARD-03**: Enforce disk space minimum (1GB free)
-- [ ] **GUARD-04**: Stop gracefully when any guardrail trips
+- [x] **GUARD-01**: Enforce experiment count limit
+- [x] **GUARD-02**: Enforce time budget (minutes)
+- [x] **GUARD-03**: Enforce disk space minimum (1GB free)
+- [x] **GUARD-04**: Stop gracefully when any guardrail trips
 
 ### Intelligence
 
@@ -54,17 +54,17 @@
 
 ### State & Recovery
 
-- [ ] **STATE-01**: Checkpoint saves after every experiment iteration
+- [x] **STATE-01**: Checkpoint saves after every experiment iteration
 - [ ] **STATE-02**: Resume from checkpoint after context reset or crash
-- [ ] **STATE-03**: Append-only results.jsonl survives partial writes
-- [ ] **STATE-04**: Human-readable experiments.md journal updated per iteration
+- [x] **STATE-03**: Append-only results.jsonl survives partial writes
+- [x] **STATE-04**: Human-readable experiments.md journal updated per iteration
 
 ### Tabular Domain
 
 - [x] **TAB-01**: sklearn, XGBoost, LightGBM model families supported
 - [x] **TAB-02**: Metrics: accuracy, f1, f1_weighted, r2, rmse, mae
 - [x] **TAB-03**: Cross-validation evaluation in train.py
-- [ ] **TAB-04**: Tabular-specific baselines (most_frequent, stratified, mean, median)
+- [x] **TAB-04**: Tabular-specific baselines (most_frequent, stratified, mean, median)
 
 ### Deep Learning Domain
 
@@ -82,9 +82,9 @@
 
 ### Finalization
 
-- [ ] **FIN-01**: Export best model artifact with metadata.json sidecar
-- [ ] **FIN-02**: Generate retrospective markdown (what worked, what didn't, trajectory)
-- [ ] **FIN-03**: Tag best commit in git (ml-best-{run_id})
+- [x] **FIN-01**: Export best model artifact with metadata.json sidecar
+- [x] **FIN-02**: Generate retrospective markdown (what worked, what didn't, trajectory)
+- [x] **FIN-03**: Tag best commit in git (ml-best-{run_id})
 
 ### Supporting Skills
 
@@ -127,24 +127,24 @@
 | PKG-02 | Phase 1 | Complete |
 | PKG-03 | Phase 1 | Complete |
 | PKG-04 | Phase 1 | Complete |
-| PROF-01 | Phase 2 | Pending |
+| PROF-01 | Phase 2 | Complete |
 | PROF-02 | Phase 2 | Complete |
-| PROF-03 | Phase 2 | Pending |
-| PROF-04 | Phase 2 | Pending |
-| SCAF-01 | Phase 2 | Pending |
-| SCAF-02 | Phase 2 | Pending |
+| PROF-03 | Phase 2 | Complete |
+| PROF-04 | Phase 2 | Complete |
+| SCAF-01 | Phase 2 | Complete |
+| SCAF-02 | Phase 2 | Complete |
 | SCAF-03 | Phase 2 | Complete |
-| SCAF-04 | Phase 2 | Pending |
-| LOOP-01 | Phase 2 | Pending |
-| LOOP-02 | Phase 2 | Pending |
-| LOOP-03 | Phase 2 | Pending |
-| LOOP-04 | Phase 2 | Pending |
-| LOOP-05 | Phase 2 | Pending |
-| LOOP-06 | Phase 2 | Pending |
-| GUARD-01 | Phase 2 | Pending |
-| GUARD-02 | Phase 2 | Pending |
-| GUARD-03 | Phase 2 | Pending |
-| GUARD-04 | Phase 2 | Pending |
+| SCAF-04 | Phase 2 | Complete |
+| LOOP-01 | Phase 2 | Complete |
+| LOOP-02 | Phase 2 | Complete |
+| LOOP-03 | Phase 2 | Complete |
+| LOOP-04 | Phase 2 | Complete |
+| LOOP-05 | Phase 2 | Complete |
+| LOOP-06 | Phase 2 | Complete |
+| GUARD-01 | Phase 2 | Complete |
+| GUARD-02 | Phase 2 | Complete |
+| GUARD-03 | Phase 2 | Complete |
+| GUARD-04 | Phase 2 | Complete |
 | INTEL-01 | Phase 3 | Pending |
 | INTEL-02 | Phase 3 | Pending |
 | INTEL-03 | Phase 3 | Pending |
@@ -152,14 +152,14 @@
 | INTEL-05 | Phase 3 | Pending |
 | INTEL-06 | Phase 3 | Pending |
 | INTEL-07 | Phase 3 | Pending |
-| STATE-01 | Phase 2 | Pending |
+| STATE-01 | Phase 2 | Complete |
 | STATE-02 | Phase 5 | Pending |
-| STATE-03 | Phase 2 | Pending |
-| STATE-04 | Phase 2 | Pending |
+| STATE-03 | Phase 2 | Complete |
+| STATE-04 | Phase 2 | Complete |
 | TAB-01 | Phase 2 | Complete |
 | TAB-02 | Phase 2 | Complete |
 | TAB-03 | Phase 2 | Complete |
-| TAB-04 | Phase 2 | Pending |
+| TAB-04 | Phase 2 | Complete |
 | DL-01 | Phase 4 | Pending |
 | DL-02 | Phase 4 | Pending |
 | DL-03 | Phase 4 | Pending |
@@ -168,9 +168,9 @@
 | FT-02 | Phase 4 | Pending |
 | FT-03 | Phase 4 | Pending |
 | FT-04 | Phase 4 | Pending |
-| FIN-01 | Phase 2 | Pending |
-| FIN-02 | Phase 2 | Pending |
-| FIN-03 | Phase 2 | Pending |
+| FIN-01 | Phase 2 | Complete |
+| FIN-02 | Phase 2 | Complete |
+| FIN-03 | Phase 2 | Complete |
 | SKILL-01 | Phase 5 | Pending |
 | SKILL-02 | Phase 5 | Pending |
 | SKILL-03 | Phase 5 | Pending |
