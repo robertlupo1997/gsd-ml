@@ -1,0 +1,29 @@
+{
+  "name": "gsd-ml",
+  "version": "0.1.0",
+  "description": "Claude Code native autonomous ML research tool. Distributed as an npm package following GSD patterns.",
+  "bin": {
+    "gsd-ml": "bin/install.js"
+  },
+  "files": [
+    "bin",
+    "commands",
+    "gsd-ml"
+  ],
+  "keywords": [
+    "claude",
+    "claude-code",
+    "ml",
+    "machine-learning",
+    "autonomous-research"
+  ],
+  "author": "Robert Lupo",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/robertlupo1997/gsd-ml.git"
+  },
+  "engines": {
+    "node": ">=16.7.0"
+  }
+}
