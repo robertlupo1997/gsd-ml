@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 05-02-PLAN.md
-last_updated: "2026-03-23T01:49:56.801Z"
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-03-23T01:50:49.863Z"
 progress:
   total_phases: 6
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 11
-  completed_plans: 10
+  completed_plans: 11
 ---
 
 ## Project Reference
@@ -44,6 +44,7 @@ See: .planning/PROJECT.md (updated 2026-03-22)
 - [Phase 04]: Inline domain conditionals in single workflow file rather than separate per-domain workflows
 - [Phase 04]: Skip diagnostics for FT with loss/perplexity metrics
 - [Phase 05]: Resume workflow hands off to ml-run.md Phase 3 directly, skipping Phase 1-2
+- [Phase 05]: All workflows use Python one-liners with gsd_ml modules for state loading
 
 ## Performance Metrics
 
@@ -59,11 +60,12 @@ See: .planning/PROJECT.md (updated 2026-03-22)
 | Phase 04 P01 | 3min | 2 tasks | 8 files |
 | Phase 04 P02 | 4min | 1 tasks | 1 files |
 | Phase 05 P02 | 2min | 1 tasks | 2 files |
+| Phase 05 P01 | 2min | 2 tasks | 6 files |
 
 ## Session History
 
-**Last session:** 2026-03-23T01:49:56.798Z
-**Stopped at:** Completed 05-02-PLAN.md
+**Last session:** 2026-03-23T01:50:49.860Z
+**Stopped at:** Completed 05-01-PLAN.md
 
 ### 2026-03-22 — Phase 1 complete
 - All 17 Python modules ported from mlforge to gsd_ml

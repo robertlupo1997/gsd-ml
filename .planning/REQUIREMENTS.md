@@ -88,10 +88,10 @@
 
 ### Supporting Skills
 
-- [ ] **SKILL-01**: /gsd:ml-status shows past experiment runs
+- [x] **SKILL-01**: /gsd:ml-status shows past experiment runs
 - [x] **SKILL-02**: /gsd:ml-resume loads checkpoint and re-enters experiment loop
-- [ ] **SKILL-03**: /gsd:ml-clean removes .ml/ directories and experiment branches
-- [ ] **SKILL-04**: /gsd:ml-diagnose runs diagnostics on current model standalone
+- [x] **SKILL-03**: /gsd:ml-clean removes .ml/ directories and experiment branches
+- [x] **SKILL-04**: /gsd:ml-diagnose runs diagnostics on current model standalone
 
 ## v2 Requirements
 
@@ -171,10 +171,10 @@
 | FIN-01 | Phase 2 | Complete |
 | FIN-02 | Phase 2 | Complete |
 | FIN-03 | Phase 2 | Complete |
-| SKILL-01 | Phase 5 | Pending |
+| SKILL-01 | Phase 5 | Complete |
 | SKILL-02 | Phase 5 | Complete |
-| SKILL-03 | Phase 5 | Pending |
-| SKILL-04 | Phase 5 | Pending |
+| SKILL-03 | Phase 5 | Complete |
+| SKILL-04 | Phase 5 | Complete |
 
 **Coverage:**
 - v1 requirements: 48 total
