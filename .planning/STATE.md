@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Phase 6 context gathered
-last_updated: "2026-03-23T02:03:19.893Z"
+stopped_at: Completed 06-01-PLAN.md
+last_updated: "2026-03-23T02:18:21.693Z"
 progress:
   total_phases: 6
   completed_phases: 5
-  total_plans: 11
-  completed_plans: 11
+  total_plans: 13
+  completed_plans: 12
 ---
 
 ## Project Reference
@@ -45,6 +45,7 @@ See: .planning/PROJECT.md (updated 2026-03-22)
 - [Phase 04]: Skip diagnostics for FT with loss/perplexity metrics
 - [Phase 05]: Resume workflow hands off to ml-run.md Phase 3 directly, skipping Phase 1-2
 - [Phase 05]: All workflows use Python one-liners with gsd_ml modules for state loading
+- [Phase 06]: Fixed ml-resume.md: replaced non-existent check_guardrails() with ResourceGuardrails API
 
 ## Performance Metrics
 
@@ -61,11 +62,12 @@ See: .planning/PROJECT.md (updated 2026-03-22)
 | Phase 04 P02 | 4min | 1 tasks | 1 files |
 | Phase 05 P02 | 2min | 1 tasks | 2 files |
 | Phase 05 P01 | 2min | 2 tasks | 6 files |
+| Phase 06 P01 | 3min | 2 tasks | 6 files |
 
 ## Session History
 
-**Last session:** 2026-03-23T02:03:19.888Z
-**Stopped at:** Phase 6 context gathered
+**Last session:** 2026-03-23T02:18:21.689Z
+**Stopped at:** Completed 06-01-PLAN.md
 
 ### 2026-03-22 — Phase 1 complete
 - All 17 Python modules ported from mlforge to gsd_ml
