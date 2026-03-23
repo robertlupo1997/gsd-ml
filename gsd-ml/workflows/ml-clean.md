@@ -4,6 +4,21 @@
 
 ---
 
+## Pre-flight Checks
+
+Verify `.ml/` directory exists:
+
+```bash
+test -d .ml/ && echo "OK" || echo "NO_ML_DIR"
+```
+
+If `.ml/` does not exist, print:
+> No experiment directory found. Nothing to clean.
+
+Then STOP. Do not proceed.
+
+---
+
 ## Step 1: Validate Experiment Directory
 
 Check for `.ml/` directory:

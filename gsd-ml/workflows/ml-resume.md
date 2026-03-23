@@ -4,6 +4,28 @@
 
 ---
 
+## Pre-flight Checks
+
+Verify the Python package is available:
+
+```bash
+python3 -c "import gsd_ml; print('OK')" 2>&1
+```
+
+If this fails (ModuleNotFoundError), STOP and tell the user:
+> gsd_ml Python package is not installed. Install with: `pip install gsd-ml` (from PyPI) or `pip install ./python` (from repo)
+
+Verify this is a git repository:
+
+```bash
+git status --porcelain 2>&1
+```
+
+If git is not available or the directory is not a git repo, STOP and tell the user:
+> This directory must be a git repository. Run `git init` first.
+
+---
+
 ## Step 1: Validate Checkpoint Exists
 
 Check that the `.ml/` directory and checkpoint file exist:
@@ -89,14 +111,22 @@ Run guardrails to check if the budget is exhausted:
 
 ```bash
 python3 -c "
-from gsd_ml.guardrails import check_guardrails
+from pathlib import Path
+from gsd_ml.guardrails import ResourceGuardrails
+from gsd_ml.state import SessionState
 import json
 
 with open('.ml/config.json') as f:
     config = json.load(f)
 
-result = check_guardrails(config)
-print(json.dumps(result))
+guardrails = ResourceGuardrails(config, Path('.ml'))
+state = SessionState(
+    experiment_count=config.get('experiment_count', 0),
+    run_id=config.get('run_id', '')
+)
+stop = guardrails.should_stop(state)
+reason = guardrails.stop_reason(state) if stop else None
+print(json.dumps({'stop': stop, 'reason': reason}))
 "
 ```
 

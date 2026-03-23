@@ -4,6 +4,19 @@
 
 ---
 
+## Pre-flight Checks
+
+Verify the Python package is available:
+
+```bash
+python3 -c "import gsd_ml; print('OK')" 2>&1
+```
+
+If this fails (ModuleNotFoundError), STOP and tell the user:
+> gsd_ml Python package is not installed. Install with: `pip install gsd-ml` (from PyPI) or `pip install ./python` (from repo)
+
+---
+
 ## Step 1: Validate Experiment Directory
 
 Check for `.ml/` directory in the current working directory:

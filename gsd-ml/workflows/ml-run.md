@@ -4,6 +4,28 @@
 
 ---
 
+## Pre-flight Checks
+
+Verify the Python package is available:
+
+```bash
+python3 -c "import gsd_ml; print('OK')" 2>&1
+```
+
+If this fails (ModuleNotFoundError), STOP and tell the user:
+> gsd_ml Python package is not installed. Install with: `pip install gsd-ml` (from PyPI) or `pip install ./python` (from repo)
+
+Verify this is a git repository:
+
+```bash
+git status --porcelain 2>&1
+```
+
+If git is not available or the directory is not a git repo, STOP and tell the user:
+> This directory must be a git repository. Run `git init` first.
+
+---
+
 ## Phase 1: Profile Dataset
 
 **Goal:** Understand the dataset before building anything.
@@ -61,7 +83,7 @@ If the file does not exist, STOP and report the error. Do not proceed.
 Run the profiler to auto-detect task type, metric, and dataset statistics:
 
 ```bash
-python -c "
+python3 -c "
 import json, pandas as pd
 from gsd_ml.profiler import profile_dataset
 from dataclasses import asdict
@@ -76,7 +98,7 @@ print(json.dumps(asdict(profile), default=str))
 Count subdirectories as classes, count images, set defaults:
 
 ```bash
-python -c "
+python3 -c "
 import json
 from pathlib import Path
 
@@ -105,7 +127,7 @@ Set: `task = "image_classification"`, `metric = "accuracy"`, `direction = "maxim
 Read the CSV/JSON file, detect number of labels:
 
 ```bash
-python -c "
+python3 -c "
 import json, pandas as pd
 from pathlib import Path
 
@@ -148,7 +170,7 @@ Skip profiling entirely. Set defaults:
 For DL and FT domains, check GPU availability early:
 
 ```bash
-python -c "
+python3 -c "
 from gsd_ml.prepare.deeplearning import get_device_info
 import json
 info = get_device_info()
@@ -352,7 +374,7 @@ Note: `start_time` is stored in config.json so it survives context resets.
 Copy the `gsd_ml.prepare.tabular` module source into `.ml/prepare.py`:
 
 ```bash
-python -c "
+python3 -c "
 import inspect
 from gsd_ml.prepare import tabular
 print(inspect.getsource(tabular))
@@ -364,7 +386,7 @@ print(inspect.getsource(tabular))
 Copy the `gsd_ml.prepare.deeplearning` module source into `.ml/prepare.py`:
 
 ```bash
-python -c "
+python3 -c "
 import inspect
 from gsd_ml.prepare import deeplearning
 print(inspect.getsource(deeplearning))
@@ -376,7 +398,7 @@ print(inspect.getsource(deeplearning))
 Copy the `gsd_ml.prepare.finetuning` module source into `.ml/prepare.py`:
 
 ```bash
-python -c "
+python3 -c "
 import inspect
 from gsd_ml.prepare import finetuning
 print(inspect.getsource(finetuning))
@@ -453,7 +475,7 @@ touch .ml/experiments.jsonl
 Run tabular baselines to establish the minimum bar:
 
 ```bash
-cd .ml && python -c "
+cd .ml && python3 -c "
 import json, pandas as pd
 from prepare import load_data, split_data, build_preprocessor
 from gsd_ml.baselines.tabular import compute_baselines
@@ -471,7 +493,7 @@ print(json.dumps(baselines, default=str))
 For image_classification:
 
 ```bash
-cd .ml && python -c "
+cd .ml && python3 -c "
 import json, numpy as np
 from pathlib import Path
 from gsd_ml.baselines.deeplearning import compute_baselines
@@ -493,7 +515,7 @@ print(json.dumps(baselines, default=str))
 For text_classification:
 
 ```bash
-cd .ml && python -c "
+cd .ml && python3 -c "
 import json, numpy as np, pandas as pd
 from pathlib import Path
 from gsd_ml.baselines.deeplearning import compute_baselines
@@ -517,7 +539,7 @@ print(json.dumps(baselines, default=str))
 **If domain == "ft":**
 
 ```bash
-cd .ml && python -c "
+cd .ml && python3 -c "
 import json
 from transformers import AutoTokenizer
 from gsd_ml.baselines.finetuning import compute_baselines
@@ -532,7 +554,7 @@ print(json.dumps(baselines, default=str))
 Persist baselines into config.json so they survive context resets:
 
 ```bash
-python -c "
+python3 -c "
 import json
 from pathlib import Path
 config = json.loads(Path('.ml/config.json').read_text())
@@ -556,7 +578,7 @@ Try 3 diverse model families to find the best starting point for iteration. Each
 **If domain == "tabular":**
 
 ```bash
-python -c "
+python3 -c "
 from gsd_ml.drafts import get_families_for_domain
 import json
 
@@ -571,7 +593,7 @@ print(json.dumps(selected))
 **If domain == "dl":**
 
 ```bash
-python -c "
+python3 -c "
 from gsd_ml.drafts import get_families_for_domain
 import json
 
@@ -586,7 +608,7 @@ print(json.dumps(selected))
 **If domain == "ft":**
 
 ```bash
-python -c "
+python3 -c "
 from gsd_ml.drafts import get_families_for_domain
 import json
 
@@ -610,7 +632,7 @@ print(json.dumps(selected))
    - Edit `.ml/train.py` to change LORA_R and LORA_ALPHA to match the family configuration (e.g., r=8/alpha=8, r=16/alpha=16, r=32/alpha=32). For `lora_full`, also remove quantization config.
 
    Then for all domains:
-   - Run `cd .ml && python train.py 2>.ml/train.log`
+   - Run `cd .ml && python3 train.py 2>.ml/train.log`
    - Parse the JSON metric from stdout
    - If the run succeeded, commit: `git add .ml/ && git commit -m "draft: {family} {metric}={value}"`
    - Record the commit hash and metric value
@@ -619,7 +641,7 @@ print(json.dumps(selected))
 3. After all drafts complete, select the best:
 
 ```bash
-python -c "
+python3 -c "
 import json
 from gsd_ml.drafts import DraftResult, select_best_draft
 
@@ -648,7 +670,7 @@ git checkout {best_commit_hash} -- .ml/train.py
 6. Record all draft results in results.jsonl with status `"draft-keep"` or `"draft-discard"`:
 
 ```bash
-python -c "
+python3 -c "
 from pathlib import Path
 from datetime import datetime, UTC
 from gsd_ml.results import ResultsTracker, ExperimentResult
@@ -713,7 +735,7 @@ Check all guardrails before starting each experiment:
 
 3. **Disk space:**
    ```bash
-   python -c "import shutil; u=shutil.disk_usage('.'); print(u.free/(1024**3))"
+   python3 -c "import shutil; u=shutil.disk_usage('.'); print(u.free/(1024**3))"
    ```
    If free disk space < 1.0 GB, STOP with message "Disk space low ({free_gb:.1f} GB free)."
 
@@ -757,7 +779,7 @@ Edit it to try a different approach. Guidance for each iteration:
 #### Step 3.3: Run train.py
 
 ```bash
-cd .ml && python train.py 2>.ml/train.log
+cd .ml && python3 train.py 2>.ml/train.log
 ```
 
 Capture stdout. Parse the LAST line of stdout that contains valid JSON.
@@ -774,7 +796,7 @@ If no valid JSON is found in stdout, treat this as an error. Read `.ml/train.log
 Use the DeviationHandler to decide what to do with this result:
 
 ```bash
-python -c "
+python3 -c "
 import json
 from gsd_ml.state import SessionState
 from gsd_ml.guardrails import DeviationHandler
@@ -813,7 +835,7 @@ After the DeviationHandler returns "keep", check whether the metric also beats b
 **If domain == "tabular":**
 
 ```bash
-python -c "
+python3 -c "
 import json
 from pathlib import Path
 from gsd_ml.baselines.tabular import passes_baseline_gate
@@ -830,7 +852,7 @@ else:
 **If domain == "dl":**
 
 ```bash
-python -c "
+python3 -c "
 import json
 from pathlib import Path
 from gsd_ml.baselines.deeplearning import passes_baseline_gate
@@ -847,7 +869,7 @@ else:
 **If domain == "ft":**
 
 ```bash
-python -c "
+python3 -c "
 import json
 from pathlib import Path
 from gsd_ml.baselines.finetuning import passes_baseline_gate
@@ -909,7 +931,7 @@ Skip diagnostics -- for FT with loss/perplexity metrics, predictions.csv contain
 **Otherwise (tabular, DL, or FT with ROUGE metrics):**
 
 ```bash
-python -c "
+python3 -c "
 import json, pandas as pd
 from pathlib import Path
 from gsd_ml.diagnostics import diagnose_regression, diagnose_classification
@@ -937,7 +959,7 @@ Display the diagnostics summary. Note: `diagnostics.json` is ephemeral (overwrit
 After a revert, check if the session has stagnated (N consecutive reverts with no improvement). Skip this step if the last decision was "keep".
 
 ```bash
-python -c "
+python3 -c "
 import json
 from gsd_ml.stagnation import check_stagnation
 from gsd_ml.state import SessionState
@@ -985,7 +1007,7 @@ Handle the result:
    ```
 3. Create exploration branch:
    ```bash
-   python -c "
+   python3 -c "
    from gsd_ml.stagnation import trigger_stagnation_branch
    from gsd_ml.state import SessionState
    state = SessionState(best_commit='{best_commit}', consecutive_reverts={consecutive_reverts})
@@ -1022,7 +1044,7 @@ After each experiment (regardless of keep/revert decision), record:
 **Append to results.jsonl:**
 
 ```bash
-python -c "
+python3 -c "
 from pathlib import Path
 from datetime import datetime, UTC
 from gsd_ml.results import ResultsTracker, ExperimentResult
@@ -1043,7 +1065,7 @@ tracker.add(ExperimentResult(
 **Append journal entry and update experiments.md:**
 
 ```bash
-python -c "
+python3 -c "
 from pathlib import Path
 from gsd_ml.journal import JournalEntry, append_journal_entry, load_journal, render_journal_markdown
 
@@ -1066,7 +1088,7 @@ Path('.ml/experiments.md').write_text(md)
 **Save checkpoint:**
 
 ```bash
-python -c "
+python3 -c "
 import json
 from pathlib import Path
 from gsd_ml.state import SessionState
@@ -1105,7 +1127,7 @@ This phase runs after the experiment loop ends (guardrail trip, stop decision, o
 If `best_metric` is not None (at least one successful experiment):
 
 ```bash
-python -c "
+python3 -c "
 import json
 from pathlib import Path
 from gsd_ml.state import SessionState
@@ -1141,7 +1163,7 @@ If no experiments succeeded (best_metric is None), skip export and note it in th
 Calculate elapsed time: `duration_minutes = (now - start_time) / 60`
 
 ```bash
-python -c "
+python3 -c "
 import json
 from pathlib import Path
 from gsd_ml.state import SessionState
@@ -1214,7 +1236,7 @@ These rules apply throughout the entire workflow:
 
 3. **Working directory** -- Always run train.py from .ml/:
    ```bash
-   cd .ml && python train.py
+   cd .ml && python3 train.py
    ```
    train.py uses paths relative to .ml/ (e.g. `../dataset.csv`).
 
