@@ -17,14 +17,13 @@ Claude Code autonomously runs structured ML experiments with full guardrails, gi
 - ✓ Claude Code runs the experiment loop: edit train.py, run it, parse metrics, keep/revert via git — Phase 2
 - ✓ Guardrails enforce cost, time, experiment count, and disk space limits — Phase 2
 - ✓ Tabular domain works (sklearn, XGBoost, LightGBM) — Phase 2
+- ✓ Diagnostics analyze where the model fails and inject findings into next iteration — Phase 3
+- ✓ Multi-draft phase explores 3-5 diverse initial solutions before linear iteration — Phase 3
+- ✓ Stagnation detection branches to new model family after N consecutive reverts — Phase 3
 - ✓ npm package installs skills, workflows, references, templates into ~/.claude/ — Phase 1
 - ✓ Python utilities installable via pip/uv for ML-specific operations — Phase 1
 
 ### Active
-
-- [ ] Diagnostics analyze where the model fails and inject findings into next iteration
-- [ ] Multi-draft phase explores 3-5 diverse initial solutions before linear iteration
-- [ ] Stagnation detection branches to new model family after N consecutive reverts
 - [ ] Checkpoint/resume survives context resets and session restarts
 - [ ] Deep learning domain works (PyTorch, timm, transformers)
 - [ ] Fine-tuning domain works (peft, trl, LoRA, QLoRA)
@@ -76,4 +75,4 @@ Claude Code autonomously runs structured ML experiments with full guardrails, gi
 | Guardrails read start_time from config.json | Survives context resets unlike in-memory timers | Validated Phase 2 |
 
 ---
-*Last updated: 2026-03-23 after Phase 2 (Core Workflow)*
+*Last updated: 2026-03-23 after Phase 3 (Intelligence Layer)*
