@@ -43,11 +43,12 @@ Plans:
   5. Guardrails stop the loop when budget exhausted
   6. Best model exported to .ml/artifacts/ with metadata
   7. Retrospective markdown generated
-**Plans:** 2 plans
+**Plans:** 3 plans
 
 Plans:
 - [ ] 02-01-PLAN.md — Static template (train-tabular.py), metric reference, skill file update
 - [ ] 02-02-PLAN.md — Complete ml-run.md workflow (profile, scaffold, loop, finalize)
+- [ ] 02-03-PLAN.md — Fix broken Python bridge calls in ml-run.md (gap closure)
 
 ### Phase 3: Intelligence Layer
 **Goal**: Smart iteration with diagnostics, stagnation branching, and multi-draft exploration
@@ -98,7 +99,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete | 2026-03-22 |
-| 2. Core Workflow | 0/2 | Planned | - |
+| 2. Core Workflow | 0/3 | Planned | - |
 | 3. Intelligence | 0/TBD | Not started | - |
 | 4. DL + FT | 0/TBD | Not started | - |
 | 5. Supporting Skills | 0/TBD | Not started | - |
