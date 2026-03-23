@@ -68,17 +68,17 @@
 
 ### Deep Learning Domain
 
-- [ ] **DL-01**: PyTorch + timm for image classification
-- [ ] **DL-02**: PyTorch + transformers for text classification
-- [ ] **DL-03**: GPU-aware training templates
-- [ ] **DL-04**: DL-specific baselines (random, most_frequent)
+- [x] **DL-01**: PyTorch + timm for image classification
+- [x] **DL-02**: PyTorch + transformers for text classification
+- [x] **DL-03**: GPU-aware training templates
+- [x] **DL-04**: DL-specific baselines (random, most_frequent)
 
 ### Fine-Tuning Domain
 
-- [ ] **FT-01**: LoRA/QLoRA via peft and trl
-- [ ] **FT-02**: HuggingFace model loading and adapter training
-- [ ] **FT-03**: Metrics: perplexity, rouge1, rougeL, loss
-- [ ] **FT-04**: FT-specific baselines (random, base_model)
+- [x] **FT-01**: LoRA/QLoRA via peft and trl
+- [x] **FT-02**: HuggingFace model loading and adapter training
+- [x] **FT-03**: Metrics: perplexity, rouge1, rougeL, loss
+- [x] **FT-04**: FT-specific baselines (random, base_model)
 
 ### Finalization
 
@@ -160,14 +160,14 @@
 | TAB-02 | Phase 2 | Complete |
 | TAB-03 | Phase 2 | Complete |
 | TAB-04 | Phase 2 | Complete |
-| DL-01 | Phase 4 | Pending |
-| DL-02 | Phase 4 | Pending |
-| DL-03 | Phase 4 | Pending |
-| DL-04 | Phase 4 | Pending |
-| FT-01 | Phase 4 | Pending |
-| FT-02 | Phase 4 | Pending |
-| FT-03 | Phase 4 | Pending |
-| FT-04 | Phase 4 | Pending |
+| DL-01 | Phase 4 | Complete |
+| DL-02 | Phase 4 | Complete |
+| DL-03 | Phase 4 | Complete |
+| DL-04 | Phase 4 | Complete |
+| FT-01 | Phase 4 | Complete |
+| FT-02 | Phase 4 | Complete |
+| FT-03 | Phase 4 | Complete |
+| FT-04 | Phase 4 | Complete |
 | FIN-01 | Phase 2 | Complete |
 | FIN-02 | Phase 2 | Complete |
 | FIN-03 | Phase 2 | Complete |
