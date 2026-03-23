@@ -17,7 +17,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-22)
 
 **Core value:** Claude Code autonomously runs structured ML experiments without subprocess spawning or double-billing
-**Current focus:** Phase 4 -- DL + Fine-Tuning (deep learning and fine-tuning domains)
+**Current focus:** Phase 5 -- Supporting Skills (resume, status, clean, diagnose)
 
 ## Progress
 
@@ -65,7 +65,7 @@ See: .planning/PROJECT.md (updated 2026-03-22)
 ## Session History
 
 **Last session:** 2026-03-23
-**Stopped at:** Phase 3 complete, ready to plan Phase 4
+**Stopped at:** Phase 4 complete, ready to plan Phase 5
 
 ### 2026-03-22 — Phase 1 complete
 - All 17 Python modules ported from mlforge to gsd_ml

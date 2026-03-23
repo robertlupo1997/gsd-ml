@@ -20,13 +20,13 @@ Claude Code autonomously runs structured ML experiments with full guardrails, gi
 - ✓ Diagnostics analyze where the model fails and inject findings into next iteration — Phase 3
 - ✓ Multi-draft phase explores 3-5 diverse initial solutions before linear iteration — Phase 3
 - ✓ Stagnation detection branches to new model family after N consecutive reverts — Phase 3
+- ✓ Deep learning domain works (PyTorch, timm, transformers) — Phase 4
+- ✓ Fine-tuning domain works (peft, trl, LoRA, QLoRA) — Phase 4
 - ✓ npm package installs skills, workflows, references, templates into ~/.claude/ — Phase 1
 - ✓ Python utilities installable via pip/uv for ML-specific operations — Phase 1
 
 ### Active
 - [ ] Checkpoint/resume survives context resets and session restarts
-- [ ] Deep learning domain works (PyTorch, timm, transformers)
-- [ ] Fine-tuning domain works (peft, trl, LoRA, QLoRA)
 - [ ] `/gsd:ml-status` shows past experiment runs
 - [ ] `/gsd:ml-resume` resumes an interrupted experiment
 - [ ] `/gsd:ml-clean` removes old experiment artifacts
@@ -64,7 +64,7 @@ Claude Code autonomously runs structured ML experiments with full guardrails, gi
 |----------|-----------|---------|
 | Claude Code does everything | No subprocess spawning = no double billing, full context | Validated Phase 2 |
 | npm distribution | Follow GSD pattern exactly for ecosystem consistency | Validated Phase 1 |
-| All 3 domains in v1 | Complete feature parity with mlforge from day one | -- Pending |
+| All 3 domains in v1 | Complete feature parity with mlforge from day one | Validated Phase 4 |
 | `.ml/` state directory | Separate from `.planning/` to allow both GSD and gsd-ml in same project | Validated Phase 2 |
 | JSON config (not TOML) | Native JS parsing, Claude Code can read/write directly, simpler | Validated Phase 2 |
 | train.py outputs JSON to stdout | Simplest metric contract between training script and Claude Code | Validated Phase 2 |
@@ -75,4 +75,4 @@ Claude Code autonomously runs structured ML experiments with full guardrails, gi
 | Guardrails read start_time from config.json | Survives context resets unlike in-memory timers | Validated Phase 2 |
 
 ---
-*Last updated: 2026-03-23 after Phase 3 (Intelligence Layer)*
+*Last updated: 2026-03-23 after Phase 4 (DL + Fine-Tuning)*
