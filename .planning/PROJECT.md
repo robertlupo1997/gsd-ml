@@ -12,23 +12,22 @@ Claude Code autonomously runs structured ML experiments with full guardrails, gi
 
 ### Validated
 
-(None yet -- ship to validate)
+- ✓ Claude Code can profile a dataset and auto-detect task type, metric, and direction — Phase 2
+- ✓ Claude Code scaffolds a `.ml/` experiment directory with frozen prepare.py and mutable train.py — Phase 2
+- ✓ Claude Code runs the experiment loop: edit train.py, run it, parse metrics, keep/revert via git — Phase 2
+- ✓ Guardrails enforce cost, time, experiment count, and disk space limits — Phase 2
+- ✓ Tabular domain works (sklearn, XGBoost, LightGBM) — Phase 2
+- ✓ npm package installs skills, workflows, references, templates into ~/.claude/ — Phase 1
+- ✓ Python utilities installable via pip/uv for ML-specific operations — Phase 1
 
 ### Active
 
-- [ ] Claude Code can profile a dataset and auto-detect task type, metric, and direction
-- [ ] Claude Code scaffolds a `.ml/` experiment directory with frozen prepare.py and mutable train.py
-- [ ] Claude Code runs the experiment loop: edit train.py, run it, parse metrics, keep/revert via git
-- [ ] Guardrails enforce cost, time, experiment count, and disk space limits
 - [ ] Diagnostics analyze where the model fails and inject findings into next iteration
 - [ ] Multi-draft phase explores 3-5 diverse initial solutions before linear iteration
 - [ ] Stagnation detection branches to new model family after N consecutive reverts
 - [ ] Checkpoint/resume survives context resets and session restarts
-- [ ] Tabular domain works (sklearn, XGBoost, LightGBM, Optuna)
 - [ ] Deep learning domain works (PyTorch, timm, transformers)
 - [ ] Fine-tuning domain works (peft, trl, LoRA, QLoRA)
-- [ ] npm package installs skills, workflows, references, templates into ~/.claude/
-- [ ] Python utilities installable via pip/uv for ML-specific operations
 - [ ] `/gsd:ml-status` shows past experiment runs
 - [ ] `/gsd:ml-resume` resumes an interrupted experiment
 - [ ] `/gsd:ml-clean` removes old experiment artifacts
@@ -64,14 +63,17 @@ Claude Code autonomously runs structured ML experiments with full guardrails, gi
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Claude Code does everything | No subprocess spawning = no double billing, full context | -- Pending |
-| npm distribution | Follow GSD pattern exactly for ecosystem consistency | -- Pending |
+| Claude Code does everything | No subprocess spawning = no double billing, full context | Validated Phase 2 |
+| npm distribution | Follow GSD pattern exactly for ecosystem consistency | Validated Phase 1 |
 | All 3 domains in v1 | Complete feature parity with mlforge from day one | -- Pending |
-| `.ml/` state directory | Separate from `.planning/` to allow both GSD and gsd-ml in same project | -- Pending |
-| JSON config (not TOML) | Native JS parsing, Claude Code can read/write directly, simpler | -- Pending |
-| train.py outputs JSON to stdout | Simplest metric contract between training script and Claude Code | -- Pending |
-| Git branch per run, commit per keep | Proven pattern from mlforge; atomic state management | -- Pending |
+| `.ml/` state directory | Separate from `.planning/` to allow both GSD and gsd-ml in same project | Validated Phase 2 |
+| JSON config (not TOML) | Native JS parsing, Claude Code can read/write directly, simpler | Validated Phase 2 |
+| train.py outputs JSON to stdout | Simplest metric contract between training script and Claude Code | Validated Phase 2 |
+| Git branch per run, commit per keep | Proven pattern from mlforge; atomic state management | Validated Phase 2 |
 | Drop swarm mode for v1 | Subprocess-based parallelism doesn't translate; redesign later if needed | -- Pending |
+| No Optuna | Claude Code iterates manually; HPO framework unnecessary | Validated Phase 2 |
+| __PLACEHOLDER__ constants | Static template with string replacement instead of Jinja2 | Validated Phase 2 |
+| Guardrails read start_time from config.json | Survives context resets unlike in-memory timers | Validated Phase 2 |
 
 ---
-*Last updated: 2026-03-22 after initial project definition*
+*Last updated: 2026-03-23 after Phase 2 (Core Workflow)*
