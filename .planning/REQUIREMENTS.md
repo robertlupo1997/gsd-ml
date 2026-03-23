@@ -55,7 +55,7 @@
 ### State & Recovery
 
 - [x] **STATE-01**: Checkpoint saves after every experiment iteration
-- [ ] **STATE-02**: Resume from checkpoint after context reset or crash
+- [x] **STATE-02**: Resume from checkpoint after context reset or crash
 - [x] **STATE-03**: Append-only results.jsonl survives partial writes
 - [x] **STATE-04**: Human-readable experiments.md journal updated per iteration
 
@@ -89,7 +89,7 @@
 ### Supporting Skills
 
 - [ ] **SKILL-01**: /gsd:ml-status shows past experiment runs
-- [ ] **SKILL-02**: /gsd:ml-resume loads checkpoint and re-enters experiment loop
+- [x] **SKILL-02**: /gsd:ml-resume loads checkpoint and re-enters experiment loop
 - [ ] **SKILL-03**: /gsd:ml-clean removes .ml/ directories and experiment branches
 - [ ] **SKILL-04**: /gsd:ml-diagnose runs diagnostics on current model standalone
 
@@ -153,7 +153,7 @@
 | INTEL-06 | Phase 3 | Complete |
 | INTEL-07 | Phase 3 | Complete |
 | STATE-01 | Phase 2 | Complete |
-| STATE-02 | Phase 5 | Pending |
+| STATE-02 | Phase 5 | Complete |
 | STATE-03 | Phase 2 | Complete |
 | STATE-04 | Phase 2 | Complete |
 | TAB-01 | Phase 2 | Complete |
@@ -172,7 +172,7 @@
 | FIN-02 | Phase 2 | Complete |
 | FIN-03 | Phase 2 | Complete |
 | SKILL-01 | Phase 5 | Pending |
-| SKILL-02 | Phase 5 | Pending |
+| SKILL-02 | Phase 5 | Complete |
 | SKILL-03 | Phase 5 | Pending |
 | SKILL-04 | Phase 5 | Pending |
 
