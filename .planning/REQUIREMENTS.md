@@ -48,9 +48,9 @@
 - [x] **INTEL-02**: Baseline gate: model must beat baselines to be kept
 - [x] **INTEL-03**: Diagnostics: analyze worst predictions, bias, feature-error correlations
 - [x] **INTEL-04**: Inject diagnostics into next iteration prompt
-- [ ] **INTEL-05**: Multi-draft phase: 3-5 diverse initial solutions, pick best
-- [ ] **INTEL-06**: Stagnation detection: N consecutive reverts triggers model family switch
-- [ ] **INTEL-07**: Branch-on-stagnation: git branch from best-ever, try different family
+- [x] **INTEL-05**: Multi-draft phase: 3-5 diverse initial solutions, pick best
+- [x] **INTEL-06**: Stagnation detection: N consecutive reverts triggers model family switch
+- [x] **INTEL-07**: Branch-on-stagnation: git branch from best-ever, try different family
 
 ### State & Recovery
 
@@ -149,9 +149,9 @@
 | INTEL-02 | Phase 3 | Complete |
 | INTEL-03 | Phase 3 | Complete |
 | INTEL-04 | Phase 3 | Complete |
-| INTEL-05 | Phase 3 | Pending |
-| INTEL-06 | Phase 3 | Pending |
-| INTEL-07 | Phase 3 | Pending |
+| INTEL-05 | Phase 3 | Complete |
+| INTEL-06 | Phase 3 | Complete |
+| INTEL-07 | Phase 3 | Complete |
 | STATE-01 | Phase 2 | Complete |
 | STATE-02 | Phase 5 | Pending |
 | STATE-03 | Phase 2 | Complete |
