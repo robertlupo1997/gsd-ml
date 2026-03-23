@@ -28,3 +28,33 @@ The profiler auto-selects metrics using this logic:
 - **Regression** (>20 unique values or float target): `r2`
 
 The `accuracy` metric is available but not auto-selected (f1 variants are more informative for imbalanced classes). The `rmse` and `mae` metrics are alternatives to `r2` for regression tasks.
+
+## Deep Learning Metrics
+
+| Metric | Task | Direction |
+|--------|------|-----------|
+| accuracy | image/text classification | maximize |
+| f1_weighted | text classification | maximize |
+| loss | any DL task | minimize |
+
+### DL Metric Selection Logic
+
+- **Image classification**: defaults to `accuracy`
+- **Text classification**: defaults to `f1_weighted`
+- `loss` is always available as an alternative metric for any DL task
+
+## Fine-Tuning Metrics
+
+| Metric | Task | Direction |
+|--------|------|-----------|
+| perplexity | causal LM | minimize |
+| loss | any FT task | minimize |
+| rouge1 | instruction following / summarization | maximize |
+| rougeL | instruction following / summarization | maximize |
+
+### FT Metric Defaults
+
+- **Default metric**: `perplexity` (lower is better, measures model confidence)
+- `loss` is the raw cross-entropy loss (lower is better)
+- `rouge1` and `rougeL` measure generation quality against reference outputs (higher is better)
+- For instruction-tuning tasks with reference outputs, prefer ROUGE metrics

@@ -62,3 +62,27 @@ def compute_baselines(
         baselines[name] = {"score": float(scores.mean()), "std": float(scores.std())}
 
     return baselines
+
+
+def passes_baseline_gate(
+    metric_value: float,
+    baselines: dict[str, dict[str, float]],
+    direction: str,
+) -> bool:
+    """Check if a metric value beats ALL baselines.
+
+    Args:
+        metric_value: The metric value to check.
+        baselines: Dict from compute_baselines() output.
+        direction: 'maximize' or 'minimize'.
+
+    Returns:
+        True only if metric strictly beats every baseline score.
+    """
+    for baseline_info in baselines.values():
+        baseline_score = baseline_info["score"]
+        if direction == "maximize" and metric_value <= baseline_score:
+            return False
+        if direction == "minimize" and metric_value >= baseline_score:
+            return False
+    return True
