@@ -292,7 +292,11 @@ Initialize tracking variables:
 - `best_metric` = None
 - `best_experiment` = None
 - `best_commit` = None
+- `consecutive_reverts` = 0
+- `tried_families` = [] (or loaded from checkpoint if resuming)
 - Read `start_time` from `.ml/config.json`
+
+If resuming from a checkpoint, load `consecutive_reverts` and `tried_families` from checkpoint.json.
 
 ### Loop: Repeat Until Guardrails Trip
 
@@ -413,6 +417,7 @@ If the baseline gate passes (or no baselines exist), proceed with the keep:
   ```
 - Store the commit hash: `best_commit = $(git rev-parse HEAD)`
 - Increment `keep_count`
+- Reset `consecutive_reverts = 0`
 
 **If "revert":**
 - Revert ONLY train.py:
@@ -421,6 +426,7 @@ If the baseline gate passes (or no baselines exist), proceed with the keep:
   ```
 - **IMPORTANT:** Do NOT revert results.jsonl, experiments.jsonl, or checkpoint.json. These are append-only state files that must survive reverts.
 - Increment `revert_count`
+- Increment `consecutive_reverts += 1`
 
 **If "retry":**
 - The run failed due to OOM (Out of Memory)
@@ -464,7 +470,86 @@ else:
 
 Display the diagnostics summary. Note: `diagnostics.json` is ephemeral (overwritten each iteration), NOT saved in checkpoint.
 
-#### Step 3.5b: Record Results
+#### Step 3.5b: Stagnation Check
+
+After a revert, check if the session has stagnated (N consecutive reverts with no improvement). Skip this step if the last decision was "keep".
+
+```bash
+python -c "
+import json
+from gsd_ml.stagnation import check_stagnation
+from gsd_ml.state import SessionState
+from gsd_ml.drafts import get_families_for_domain
+
+state = SessionState(
+    consecutive_reverts={consecutive_reverts},
+    tried_families={tried_families_list},
+    best_commit='{best_commit}',
+    best_metric={best_metric},
+    run_id='{run_id}',
+    task='{task}'
+)
+
+config = json.loads(open('.ml/config.json').read())
+threshold = config.get('stagnation_threshold', 3)
+
+if check_stagnation(state, threshold):
+    families = get_families_for_domain('tabular')
+    untried = [f for f in families if f not in state.tried_families]
+    if untried:
+        print(json.dumps({'stagnated': True, 'new_family': untried[0], 'all_exhausted': False}))
+    else:
+        print(json.dumps({'stagnated': True, 'new_family': None, 'all_exhausted': True}))
+else:
+    print(json.dumps({'stagnated': False}))
+"
+```
+
+Handle the result:
+
+**If stagnated and new_family available:**
+
+1. Print: "Stagnation detected ({consecutive_reverts} consecutive reverts). Branching to try {new_family}."
+2. Save current state files to a temp location:
+   ```bash
+   cp .ml/results.jsonl /tmp/ml-stag-results.jsonl
+   cp .ml/experiments.jsonl /tmp/ml-stag-experiments.jsonl
+   cp .ml/checkpoint.json /tmp/ml-stag-checkpoint.json
+   cp .ml/diagnostics.json /tmp/ml-stag-diagnostics.json 2>/dev/null || true
+   ```
+3. Create exploration branch:
+   ```bash
+   python -c "
+   from gsd_ml.stagnation import trigger_stagnation_branch
+   from gsd_ml.state import SessionState
+   state = SessionState(best_commit='{best_commit}', consecutive_reverts={consecutive_reverts})
+   branch = trigger_stagnation_branch('.', state, '{new_family}')
+   print(branch)
+   "
+   ```
+4. Restore saved state files back to `.ml/`:
+   ```bash
+   cp /tmp/ml-stag-results.jsonl .ml/results.jsonl
+   cp /tmp/ml-stag-experiments.jsonl .ml/experiments.jsonl
+   cp /tmp/ml-stag-checkpoint.json .ml/checkpoint.json
+   cp /tmp/ml-stag-diagnostics.json .ml/diagnostics.json 2>/dev/null || true
+   ```
+5. Add `new_family` to `tried_families`
+6. Reset `consecutive_reverts = 0`
+7. Edit train.py to use the new model family
+8. Continue the loop (next iteration will use the new family)
+
+**If stagnated but all families exhausted:**
+
+1. Print: "All model families exhausted. Continuing with current approach (trying hyperparameter variations)."
+2. Reset `consecutive_reverts = 0` (give it another N tries)
+3. Continue the loop
+
+**If not stagnated:**
+
+Continue to Step 3.5c (Record Results) -- no action needed.
+
+#### Step 3.5c: Record Results
 
 After each experiment (regardless of keep/revert decision), record:
 
@@ -529,7 +614,9 @@ state = SessionState(
     best_metric={best_metric_or_None},
     best_commit='{best_commit_or_empty}',
     task='{task}',
-    baselines=config.get('baselines')
+    baselines=config.get('baselines'),
+    consecutive_reverts={consecutive_reverts},
+    tried_families={tried_families_list}
 )
 save_checkpoint(state, Path('.ml'))
 "
@@ -668,3 +755,5 @@ These rules apply throughout the entire workflow:
 7. **Git branch** -- The branch `ml/run-{run_id}` must be created BEFORE the first experiment commit. All experiment commits go on this branch, never on main.
 
 8. **State files** -- checkpoint.json, results.jsonl, and experiments.jsonl are the source of truth. They must be committed with keeps and never reverted.
+
+9. **Stagnation state files** -- Before branching on stagnation, save results.jsonl, experiments.jsonl, checkpoint.json, and diagnostics.json. After creating the explore branch, restore these files. The explore branch starts from best-ever train.py but keeps the full experiment history.
