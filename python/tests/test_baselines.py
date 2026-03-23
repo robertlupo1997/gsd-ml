@@ -116,3 +116,98 @@ class TestPassesBaselineGate:
         from gsd_ml.baselines.tabular import passes_baseline_gate
 
         assert passes_baseline_gate(0.5, {}, direction="maximize") is True
+
+
+# ---------------------------------------------------------------------------
+# DL baselines
+# ---------------------------------------------------------------------------
+
+
+class TestDLBaselines:
+    """Deep learning baseline computation and gate."""
+
+    def test_compute_baselines_classification(self):
+        import numpy as np
+        from gsd_ml.baselines.deeplearning import compute_baselines
+
+        labels = np.array([0, 1, 2, 0, 1, 2, 0, 1, 2, 0])
+        baselines = compute_baselines(labels, scoring="accuracy")
+        assert "random" in baselines
+        assert "most_frequent" in baselines
+        for result in baselines.values():
+            assert "score" in result
+            assert "std" in result
+
+    def test_compute_baselines_loss(self):
+        import numpy as np
+        from gsd_ml.baselines.deeplearning import compute_baselines
+
+        labels = np.array([0, 1, 2])
+        baselines = compute_baselines(labels, scoring="loss")
+        assert "random_guess" in baselines
+        assert baselines["random_guess"]["score"] > 0
+
+    def test_passes_baseline_gate_maximize_passes(self):
+        from gsd_ml.baselines.deeplearning import passes_baseline_gate
+
+        baselines = {"random": {"score": 0.5, "std": 0.01}}
+        assert passes_baseline_gate(0.8, baselines, direction="maximize") is True
+
+    def test_passes_baseline_gate_maximize_fails(self):
+        from gsd_ml.baselines.deeplearning import passes_baseline_gate
+
+        baselines = {"random": {"score": 0.5, "std": 0.01}}
+        assert passes_baseline_gate(0.3, baselines, direction="maximize") is False
+
+    def test_passes_baseline_gate_minimize_passes(self):
+        from gsd_ml.baselines.deeplearning import passes_baseline_gate
+
+        baselines = {"random_guess": {"score": 10.0, "std": 0.0}}
+        assert passes_baseline_gate(2.0, baselines, direction="minimize") is True
+
+    def test_passes_baseline_gate_minimize_fails(self):
+        from gsd_ml.baselines.deeplearning import passes_baseline_gate
+
+        baselines = {"random_guess": {"score": 10.0, "std": 0.0}}
+        assert passes_baseline_gate(15.0, baselines, direction="minimize") is False
+
+
+# ---------------------------------------------------------------------------
+# FT baselines
+# ---------------------------------------------------------------------------
+
+
+class TestFTBaselines:
+    """Fine-tuning baseline computation and gate."""
+
+    def test_compute_baselines_loss(self):
+        from gsd_ml.baselines.finetuning import compute_baselines
+
+        baselines = compute_baselines(metric="loss", vocab_size=32000)
+        assert "random_guess" in baselines
+        assert "untrained_model" in baselines
+        assert baselines["random_guess"]["score"] > baselines["untrained_model"]["score"]
+
+    def test_compute_baselines_perplexity(self):
+        from gsd_ml.baselines.finetuning import compute_baselines
+
+        baselines = compute_baselines(metric="perplexity", vocab_size=32000)
+        assert baselines["random_guess"]["score"] == 32000.0
+
+    def test_passes_baseline_gate_minimize_passes(self):
+        from gsd_ml.baselines.finetuning import passes_baseline_gate
+
+        baselines = {"random_guess": {"score": 10.0, "std": 0.0}}
+        assert passes_baseline_gate(2.0, baselines, direction="minimize") is True
+
+    def test_passes_baseline_gate_minimize_fails(self):
+        from gsd_ml.baselines.finetuning import passes_baseline_gate
+
+        baselines = {"random_guess": {"score": 10.0, "std": 0.0}}
+        assert passes_baseline_gate(15.0, baselines, direction="minimize") is False
+
+    def test_passes_baseline_gate_maximize_passes(self):
+        from gsd_ml.baselines.finetuning import passes_baseline_gate
+
+        baselines = {"baseline": {"score": 0.3, "std": 0.0}}
+        assert passes_baseline_gate(0.5, baselines, direction="maximize") is True
