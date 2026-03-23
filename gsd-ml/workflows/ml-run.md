@@ -161,7 +161,7 @@ df = load_data('{dataset_path}')
 X_train, X_test, y_train, y_test = split_data(df, '{target_column}')
 preprocessor = build_preprocessor(X_train)
 X_proc = preprocessor.fit_transform(X_train)
-baselines = compute_baselines(X_proc, y_train, '{task}', '{metric}')
+baselines = compute_baselines(X_proc, y_train, '{metric}', '{task}')
 print(json.dumps(baselines, default=str))
 "
 ```
@@ -250,14 +250,30 @@ Use the DeviationHandler to decide what to do with this result:
 ```bash
 python -c "
 import json
+from gsd_ml.state import SessionState
 from gsd_ml.guardrails import DeviationHandler
-handler = DeviationHandler({})
-decision = handler.handle(
-    metric_value={metric_value},
+
+# Build result dict from train.py outcome
+stderr = open('.ml/train.log').read()
+if 'MemoryError' in stderr or 'OOM' in stderr:
+    result = {'status': 'crash', 'error': stderr[-500:]}
+elif {metric_value} is None:
+    result = {'status': 'crash', 'error': 'No metric produced'}
+else:
+    result = {'status': 'ok', 'metric_value': {metric_value}}
+
+state = SessionState(
+    experiment_count={experiment_count},
     best_metric={best_metric_or_None},
-    direction='{direction}',
-    stderr=open('.ml/train.log').read()
+    best_commit='{best_commit_or_empty}',
+    total_keeps={keep_count},
+    total_reverts={revert_count},
+    run_id='{run_id}',
+    task='{task}'
 )
+
+handler = DeviationHandler(direction='{direction}')
+decision = handler.handle(result, state)
 print(json.dumps({'decision': decision}))
 "
 ```
@@ -305,15 +321,19 @@ After each experiment (regardless of keep/revert decision), record:
 ```bash
 python -c "
 from pathlib import Path
-from gsd_ml.results import ResultsTracker
+from datetime import datetime, UTC
+from gsd_ml.results import ResultsTracker, ExperimentResult
+
 tracker = ResultsTracker(Path('.ml/results.jsonl'))
-tracker.add({
-    'experiment': {N},
-    'metric_name': '{metric}',
-    'metric_value': {value},
-    'kept': {True_or_False},
-    'description': '{what was tried}'
-})
+tracker.add(ExperimentResult(
+    experiment_id={N},
+    commit_hash={commit_hash_repr},
+    metric_name='{metric}',
+    metric_value={value},
+    status='{keep_or_revert}',
+    description='{what was tried}',
+    timestamp=datetime.now(UTC).isoformat()
+))
 "
 ```
 
@@ -323,17 +343,17 @@ tracker.add({
 python -c "
 from pathlib import Path
 from gsd_ml.journal import JournalEntry, append_journal_entry, load_journal, render_journal_markdown
+
 entry = JournalEntry(
-    experiment={N},
-    metric_name='{metric}',
+    experiment_id={N},
+    hypothesis='{what was tried and why}',
+    result='{outcome description}',
     metric_value={value},
-    kept={True_or_False},
-    description='{what was tried}',
-    model_family='{model_family}',
-    commit_hash='{commit_hash_or_empty}',
-    timestamp='{ISO_timestamp}'
+    metric_delta={delta_or_None},
+    commit_hash={commit_hash_repr},
+    status='{keep_or_revert}'
 )
-append_journal_entry(entry, Path('.ml/experiments.jsonl'))
+append_journal_entry(Path('.ml/experiments.jsonl'), entry)
 entries = load_journal(Path('.ml/experiments.jsonl'))
 md = render_journal_markdown(entries)
 Path('.ml/experiments.md').write_text(md)
@@ -349,14 +369,12 @@ from gsd_ml.state import SessionState
 from gsd_ml.checkpoint import save_checkpoint
 state = SessionState(
     run_id='{run_id}',
-    domain='tabular',
     experiment_count={N},
-    keep_count={keeps},
-    revert_count={reverts},
+    total_keeps={keeps},
+    total_reverts={reverts},
     best_metric={best_metric_or_None},
-    best_experiment={best_exp_or_None},
     best_commit='{best_commit_or_empty}',
-    start_time='{start_time}'
+    task='{task}'
 )
 save_checkpoint(state, Path('.ml'))
 "
@@ -382,17 +400,24 @@ If `best_metric` is not None (at least one successful experiment):
 python -c "
 import json
 from pathlib import Path
+from gsd_ml.state import SessionState
 from gsd_ml.export import export_artifact
-metadata = {
-    'run_id': '{run_id}',
-    'metric_name': '{metric}',
-    'metric_value': {best_metric},
-    'best_experiment': {best_experiment},
-    'best_commit': '{best_commit}',
-    'domain': 'tabular',
-    'task': '{task}'
-}
-export_artifact(Path('.ml/best_model.joblib'), Path('.ml/artifacts'), metadata)
+
+state = SessionState(
+    experiment_count={experiment_count},
+    best_metric={best_metric},
+    best_commit='{best_commit}',
+    total_keeps={keep_count},
+    total_reverts={revert_count},
+    run_id='{run_id}',
+    task='{task}'
+)
+config = json.loads(Path('.ml/config.json').read_text())
+result = export_artifact(Path('.ml'), state, config)
+if result:
+    print(f'Exported to {result}')
+else:
+    print('No model artifact found to export')
 "
 ```
 
@@ -406,26 +431,23 @@ Calculate elapsed time: `duration_minutes = (now - start_time) / 60`
 python -c "
 import json
 from pathlib import Path
+from gsd_ml.state import SessionState
 from gsd_ml.results import ResultsTracker
 from gsd_ml.retrospective import generate_retrospective
+
 tracker = ResultsTracker(Path('.ml/results.jsonl'))
-results = tracker.load()
-config = {
-    'run_id': '{run_id}',
-    'domain': 'tabular',
-    'task': '{task}',
-    'metric': '{metric}',
-    'direction': '{direction}',
-    'dataset_path': '{dataset_path}',
-    'target_column': '{target_column}',
-    'experiments': results,
-    'best_metric': {best_metric},
-    'best_experiment': {best_experiment},
-    'total_keeps': {keep_count},
-    'total_reverts': {revert_count},
-    'duration_minutes': {elapsed_minutes}
-}
-md = generate_retrospective(config)
+state = SessionState(
+    experiment_count={experiment_count},
+    best_metric={best_metric_or_None},
+    best_commit='{best_commit_or_empty}',
+    total_keeps={keep_count},
+    total_reverts={revert_count},
+    run_id='{run_id}',
+    cost_spent_usd=0.0,
+    task='{task}'
+)
+config = json.loads(Path('.ml/config.json').read_text())
+md = generate_retrospective(tracker, state, config)
 Path('.ml/RETROSPECTIVE.md').write_text(md)
 print('Retrospective written to .ml/RETROSPECTIVE.md')
 "
