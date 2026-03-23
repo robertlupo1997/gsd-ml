@@ -106,7 +106,9 @@ Write `.ml/config.json` with experiment configuration:
   "direction": "{direction}",
   "budget_experiments": 25,
   "budget_minutes": 60,
-  "start_time": "{ISO timestamp}"
+  "start_time": "{ISO timestamp}",
+  "stagnation_threshold": 3,
+  "draft_families": ["linear", "random_forest", "xgboost"]
 }
 ```
 
@@ -180,13 +182,95 @@ Path('.ml/config.json').write_text(json.dumps(config, indent=2))
 
 Display baseline results. These are the minimum performance thresholds the model must beat.
 
-### Step 2.8: Create Git Branch
+### Step 2.8: Multi-Draft Exploration
+
+Try 3 diverse model families to find the best starting point for iteration. Each draft gets one training run with default hyperparameters.
+
+**Note:** The baseline gate does NOT apply during drafts. It only applies during the iteration loop (Step 3.4). During drafts, even results below baselines are kept for comparison.
+
+**Sub-steps:**
+
+1. Get available families from config:
+
+```bash
+python -c "
+from gsd_ml.drafts import get_families_for_domain
+import json
+
+config = json.loads(open('.ml/config.json').read())
+draft_families = config.get('draft_families', ['linear', 'random_forest', 'xgboost'])
+families = get_families_for_domain('tabular')
+selected = {k: v for k, v in families.items() if k in draft_families}
+print(json.dumps(selected))
+"
+```
+
+2. For each family (e.g., linear, random_forest, xgboost):
+   - Edit `.ml/train.py` to use that family's model class (e.g., LogisticRegression for linear, RandomForestClassifier for random_forest, XGBClassifier for xgboost). Use default hyperparameters.
+   - Run `cd .ml && python train.py 2>.ml/train.log`
+   - Parse the JSON metric from stdout
+   - If the run succeeded, commit: `git add .ml/ && git commit -m "draft: {family} {metric}={value}"`
+   - Record the commit hash and metric value
+   - If the run failed (OOM, error), record metric_value=None
+
+3. After all drafts complete, select the best:
+
+```bash
+python -c "
+import json
+from gsd_ml.drafts import DraftResult, select_best_draft
+
+drafts = [
+    DraftResult(name='{family1}', metric_value={val1}, status='draft-keep', commit_hash='{hash1}', description='{desc1}'),
+    DraftResult(name='{family2}', metric_value={val2}, status='draft-keep', commit_hash='{hash2}', description='{desc2}'),
+    # ... one per draft that succeeded
+]
+best = select_best_draft(drafts, direction='{direction}')
+print(json.dumps({'name': best.name, 'commit_hash': best.commit_hash, 'metric_value': best.metric_value}))
+"
+```
+
+4. Checkout the best draft's train.py:
+
+```bash
+git checkout {best_commit_hash} -- .ml/train.py
+```
+
+5. Set initial state from draft results:
+   - `best_metric = best_draft.metric_value`
+   - `best_commit = best_draft.commit_hash`
+   - Add all draft family names to `tried_families`
+   - `experiment_count = number_of_drafts_run` (drafts count against budget)
+
+6. Record all draft results in results.jsonl with status `"draft-keep"` or `"draft-discard"`:
+
+```bash
+python -c "
+from pathlib import Path
+from datetime import datetime, UTC
+from gsd_ml.results import ResultsTracker, ExperimentResult
+
+tracker = ResultsTracker(Path('.ml/results.jsonl'))
+# For each draft:
+tracker.add(ExperimentResult(
+    experiment_id={N},
+    commit_hash={commit_hash_repr},
+    metric_name='{metric}',
+    metric_value={value},
+    status='{draft-keep_or_draft-discard}',
+    description='Draft: {family} with default hyperparameters',
+    timestamp=datetime.now(UTC).isoformat()
+))
+"
+```
+
+### Step 2.9: Create Git Branch
 
 ```bash
 git checkout -b ml/run-{run_id}
 ```
 
-### Step 2.9: Initial Commit
+### Step 2.10: Initial Commit
 
 ```bash
 git add .ml/
