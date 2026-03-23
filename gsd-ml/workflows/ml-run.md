@@ -11,11 +11,15 @@
 ### Step 1.1: Parse Arguments
 
 Extract from the skill invocation:
-- `dataset_path` -- path to the CSV file (first argument)
-- `target_column` -- name of the target column (second argument)
-- `domain` -- defaults to `"tabular"`
+- `dataset_path` -- path to the CSV file (tabular), image directory (DL image), or data file (DL text, FT)
+- `target_column` -- name of the target column (tabular, DL text) or None (DL image uses subdirectory names, FT has no target)
+- `domain` -- defaults to `"tabular"`. Valid values: `"tabular"`, `"dl"`, `"ft"`
+- `task` -- (DL only) `"image_classification"` or `"text_classification"`. Ignored for tabular/ft.
+- `model_name` -- (FT required, DL optional) HuggingFace model name (e.g. `"meta-llama/Llama-2-7b-hf"`) or timm model name (e.g. `"resnet50"`)
 
 ### Step 1.2: Verify Dataset Exists
+
+**If domain == "tabular":**
 
 ```bash
 test -f {dataset_path} || echo "ERROR: Dataset not found at {dataset_path}"
@@ -23,7 +27,36 @@ test -f {dataset_path} || echo "ERROR: Dataset not found at {dataset_path}"
 
 If the file does not exist, STOP and report the error. Do not proceed.
 
+**If domain == "dl":**
+
+For `task == "image_classification"`: verify the dataset path is a directory with subdirectories (one per class):
+
+```bash
+test -d {dataset_path} || echo "ERROR: Image directory not found at {dataset_path}"
+ls -d {dataset_path}/*/ 2>/dev/null | head -5 || echo "ERROR: No class subdirectories found in {dataset_path}"
+```
+
+For `task == "text_classification"`: verify the data file exists (CSV or JSON):
+
+```bash
+test -f {dataset_path} || echo "ERROR: Text data file not found at {dataset_path}"
+```
+
+If verification fails, STOP and report the error. Do not proceed.
+
+**If domain == "ft":**
+
+Verify the data file exists (JSONL, JSON, or CSV):
+
+```bash
+test -f {dataset_path} || echo "ERROR: Data file not found at {dataset_path}"
+```
+
+If the file does not exist, STOP and report the error. Do not proceed.
+
 ### Step 1.3: Profile the Dataset
+
+**If domain == "tabular":**
 
 Run the profiler to auto-detect task type, metric, and dataset statistics:
 
@@ -38,7 +71,103 @@ print(json.dumps(asdict(profile), default=str))
 "
 ```
 
+**If domain == "dl" and task == "image_classification":**
+
+Count subdirectories as classes, count images, set defaults:
+
+```bash
+python -c "
+import json
+from pathlib import Path
+
+data_dir = Path('{dataset_path}')
+class_dirs = sorted([d for d in data_dir.iterdir() if d.is_dir()])
+num_classes = len(class_dirs)
+total_images = sum(len(list(d.glob('*.*'))) for d in class_dirs)
+class_names = [d.name for d in class_dirs]
+
+profile = {
+    'task': 'image_classification',
+    'metric': 'accuracy',
+    'direction': 'maximize',
+    'num_classes': num_classes,
+    'total_images': total_images,
+    'class_names': class_names,
+}
+print(json.dumps(profile))
+"
+```
+
+Set: `task = "image_classification"`, `metric = "accuracy"`, `direction = "maximize"`.
+
+**If domain == "dl" and task == "text_classification":**
+
+Read the CSV/JSON file, detect number of labels:
+
+```bash
+python -c "
+import json, pandas as pd
+from pathlib import Path
+
+path = Path('{dataset_path}')
+if path.suffix == '.json':
+    df = pd.read_json(path)
+else:
+    df = pd.read_csv(path)
+
+num_labels = df['{target_column}'].nunique()
+n_rows = len(df)
+label_dist = df['{target_column}'].value_counts().to_dict()
+
+profile = {
+    'task': 'text_classification',
+    'metric': 'f1_weighted',
+    'direction': 'maximize',
+    'num_labels': num_labels,
+    'n_rows': n_rows,
+    'label_distribution': {str(k): v for k, v in label_dist.items()},
+}
+print(json.dumps(profile))
+"
+```
+
+Set: `task = "text_classification"`, `metric = "f1_weighted"`, `direction = "maximize"`.
+
+**If domain == "ft":**
+
+Skip profiling entirely. Set defaults:
+
+- `task = "sft"`
+- `metric = "perplexity"` (or user-specified; valid options: `"perplexity"`, `"loss"`, `"rouge1"`, `"rouge2"`, `"rougeL"`)
+- `direction = "minimize"` (except ROUGE metrics which are `"maximize"`)
+
+### Step 1.3a: GPU Check (DL and FT Only)
+
+**Skip this step if domain == "tabular".**
+
+For DL and FT domains, check GPU availability early:
+
+```bash
+python -c "
+from gsd_ml.prepare.deeplearning import get_device_info
+import json
+info = get_device_info()
+print(json.dumps(info))
+"
+```
+
+If the device is `"cpu"`, print a prominent warning:
+
+```
+WARNING: No GPU detected. DL/FT training will be very slow.
+Consider using a GPU-enabled machine for better performance.
+```
+
+Do NOT block the workflow -- just warn and continue.
+
 ### Step 1.4: Parse Profile Output
+
+**If domain == "tabular":**
 
 Extract from the JSON output:
 - `task` -- "classification" or "regression"
@@ -49,9 +178,22 @@ Extract from the JSON output:
 - `missing_pct` -- percentage of missing values
 - `leakage_warnings` -- list of leakage warnings (may be empty)
 
+**If domain == "dl":**
+
+Extract from the profile output:
+- `task` -- "image_classification" or "text_classification"
+- `metric` -- "accuracy" (image) or "f1_weighted" (text)
+- `direction` -- "maximize"
+- For image: `num_classes`, `total_images`, `class_names`
+- For text: `num_labels`, `n_rows`, `label_distribution`
+
+**If domain == "ft":**
+
+No profiling output to parse. Use the defaults set in Step 1.3.
+
 ### Step 1.5: Display Profile Summary
 
-Print a summary for the user:
+**If domain == "tabular":**
 
 ```
 Dataset Profile:
@@ -63,7 +205,42 @@ Dataset Profile:
   Leakage warnings: {len(leakage_warnings)}
 ```
 
+**If domain == "dl" and task == "image_classification":**
+
+```
+Dataset Profile:
+  Domain: Deep Learning (Image Classification)
+  Classes: {num_classes}
+  Total Images: {total_images}
+  Class Names: {class_names}
+  Metric: {metric} ({direction})
+```
+
+**If domain == "dl" and task == "text_classification":**
+
+```
+Dataset Profile:
+  Domain: Deep Learning (Text Classification)
+  Rows: {n_rows}
+  Labels: {num_labels}
+  Label Distribution: {label_distribution}
+  Metric: {metric} ({direction})
+```
+
+**If domain == "ft":**
+
+```
+Dataset Profile:
+  Domain: Fine-Tuning (SFT)
+  Model: {model_name}
+  Data: {dataset_path}
+  Task: sft
+  Metric: {metric} ({direction})
+```
+
 ### Step 1.6: Handle Leakage Warnings
+
+**If domain == "tabular":**
 
 If `leakage_warnings` is non-empty:
 1. Display each warning prominently (e.g. "WARNING: {warning}")
@@ -71,6 +248,10 @@ If `leakage_warnings` is non-empty:
 3. If user says no, STOP the workflow
 
 If `leakage_warnings` is empty, continue silently.
+
+**If domain == "dl" or domain == "ft":**
+
+Skip this step -- leakage detection is not applicable to DL/FT domains.
 
 ---
 
@@ -93,6 +274,8 @@ mkdir -p .ml/artifacts
 
 ### Step 2.3: Write config.json
 
+**If domain == "tabular":**
+
 Write `.ml/config.json` with experiment configuration:
 
 ```json
@@ -112,10 +295,59 @@ Write `.ml/config.json` with experiment configuration:
 }
 ```
 
-Note: `dataset_path` is relative to the `.ml/` directory (typically `../dataset.csv`).
+**If domain == "dl":**
+
+```json
+{
+  "run_id": "{run_id}",
+  "domain": "dl",
+  "dataset_path": "../{relative_path_to_data}",
+  "target_column": "{target_column_or_null}",
+  "task": "{image_classification|text_classification}",
+  "metric": "{metric}",
+  "direction": "{direction}",
+  "model_name": "{model_name_or_default}",
+  "img_size": 224,
+  "budget_experiments": 15,
+  "budget_minutes": 120,
+  "start_time": "{ISO timestamp}",
+  "stagnation_threshold": 3,
+  "draft_families": ["resnet", "vit", "efficientnet"]
+}
+```
+
+Note: `img_size` is only relevant for image_classification. For text_classification, it can be omitted or ignored.
+
+**If domain == "ft":**
+
+```json
+{
+  "run_id": "{run_id}",
+  "domain": "ft",
+  "dataset_path": "../{relative_path_to_data}",
+  "task": "sft",
+  "metric": "{metric}",
+  "direction": "{direction}",
+  "model_name": "{model_name}",
+  "lora_r": 8,
+  "lora_alpha": 8,
+  "max_length": 512,
+  "learning_rate": 2e-4,
+  "num_epochs": 3,
+  "budget_experiments": 10,
+  "budget_minutes": 120,
+  "start_time": "{ISO timestamp}",
+  "stagnation_threshold": 3,
+  "draft_families": ["qlora_r8", "qlora_r16", "qlora_r32"]
+}
+```
+
+Note: `dataset_path` is relative to the `.ml/` directory (typically `../dataset.csv` or `../data.jsonl`).
 Note: `start_time` is stored in config.json so it survives context resets.
 
 ### Step 2.4: Create prepare.py (Frozen Data Pipeline)
+
+**If domain == "tabular":**
 
 Copy the `gsd_ml.prepare.tabular` module source into `.ml/prepare.py`:
 
@@ -127,11 +359,37 @@ print(inspect.getsource(tabular))
 "
 ```
 
+**If domain == "dl":**
+
+Copy the `gsd_ml.prepare.deeplearning` module source into `.ml/prepare.py`:
+
+```bash
+python -c "
+import inspect
+from gsd_ml.prepare import deeplearning
+print(inspect.getsource(deeplearning))
+"
+```
+
+**If domain == "ft":**
+
+Copy the `gsd_ml.prepare.finetuning` module source into `.ml/prepare.py`:
+
+```bash
+python -c "
+import inspect
+from gsd_ml.prepare import finetuning
+print(inspect.getsource(finetuning))
+"
+```
+
 Write the output to `.ml/prepare.py`.
 
 **IMPORTANT:** This file is FROZEN. The workflow must NEVER edit prepare.py.
 
 ### Step 2.5: Create train.py (Starter Template)
+
+**If domain == "tabular":**
 
 Read the static template from `~/.claude/gsd-ml/templates/train-tabular.py`.
 
@@ -140,6 +398,44 @@ Replace the 4 placeholder constants with actual values from the profile:
 - `__TARGET_COLUMN__` -> the target column name
 - `__METRIC__` -> the metric name (e.g. `accuracy`)
 - `__TASK__` -> the task type (e.g. `classification`)
+
+**If domain == "dl" and task == "image_classification":**
+
+Read the static template from `~/.claude/gsd-ml/templates/train-dl-image.py`.
+
+Replace the placeholder constants with actual values:
+- `__DATA_PATH__` -> the image directory path relative to .ml/ (e.g. `../images/`)
+- `__METRIC__` -> the metric name (e.g. `accuracy`)
+- `__MODEL_NAME__` -> the model name (e.g. `resnet50`)
+- `__IMG_SIZE__` -> the image size (e.g. `224`)
+- `__BATCH_SIZE__` -> the batch size (e.g. `32`)
+- `__TIME_BUDGET_SEC__` -> time budget in seconds (e.g. `3600`)
+
+**If domain == "dl" and task == "text_classification":**
+
+Read the static template from `~/.claude/gsd-ml/templates/train-dl-text.py`.
+
+Replace the placeholder constants with actual values:
+- `__DATA_PATH__` -> the text data file path relative to .ml/ (e.g. `../data.csv`)
+- `__METRIC__` -> the metric name (e.g. `f1_weighted`)
+- `__MODEL_NAME__` -> the model name (e.g. `distilbert-base-uncased`)
+- `__BATCH_SIZE__` -> the batch size (e.g. `16`)
+- `__TIME_BUDGET_SEC__` -> time budget in seconds (e.g. `3600`)
+
+**If domain == "ft":**
+
+Read the static template from `~/.claude/gsd-ml/templates/train-ft.py`.
+
+Replace the placeholder constants with actual values:
+- `__DATA_PATH__` -> the data file path relative to .ml/ (e.g. `../data.jsonl`)
+- `__MODEL_NAME__` -> the HuggingFace model name (e.g. `meta-llama/Llama-2-7b-hf`)
+- `__METRIC__` -> the metric name (e.g. `perplexity`)
+- `__LORA_R__` -> LoRA rank (e.g. `8`)
+- `__LORA_ALPHA__` -> LoRA alpha (e.g. `8`)
+- `__MAX_LENGTH__` -> max sequence length (e.g. `512`)
+- `__BATCH_SIZE__` -> batch size (e.g. `4`)
+- `__LEARNING_RATE__` -> learning rate (e.g. `2e-4`)
+- `__NUM_EPOCHS__` -> number of training epochs (e.g. `3`)
 
 Write the customized file to `.ml/train.py`.
 
@@ -151,6 +447,8 @@ touch .ml/experiments.jsonl
 ```
 
 ### Step 2.7: Compute Baselines
+
+**If domain == "tabular":**
 
 Run tabular baselines to establish the minimum bar:
 
@@ -164,6 +462,69 @@ X_train, X_test, y_train, y_test = split_data(df, '{target_column}')
 preprocessor = build_preprocessor(X_train)
 X_proc = preprocessor.fit_transform(X_train)
 baselines = compute_baselines(X_proc, y_train, '{metric}', '{task}')
+print(json.dumps(baselines, default=str))
+"
+```
+
+**If domain == "dl":**
+
+For image_classification:
+
+```bash
+cd .ml && python -c "
+import json, numpy as np
+from pathlib import Path
+from gsd_ml.baselines.deeplearning import compute_baselines
+
+# Get labels from directory structure
+data_dir = Path('{dataset_path}')
+class_dirs = sorted([d for d in data_dir.iterdir() if d.is_dir()])
+labels = []
+for i, d in enumerate(class_dirs):
+    count = len(list(d.glob('*.*')))
+    labels.extend([i] * count)
+labels = np.array(labels)
+
+baselines = compute_baselines(labels, '{metric}', 'image_classification')
+print(json.dumps(baselines, default=str))
+"
+```
+
+For text_classification:
+
+```bash
+cd .ml && python -c "
+import json, numpy as np, pandas as pd
+from pathlib import Path
+from gsd_ml.baselines.deeplearning import compute_baselines
+
+path = Path('{dataset_path}')
+if path.suffix == '.json':
+    df = pd.read_json(path)
+else:
+    df = pd.read_csv(path)
+
+from sklearn.preprocessing import LabelEncoder
+le = LabelEncoder()
+labels = le.fit_transform(df['{target_column}'].values)
+labels = np.array(labels)
+
+baselines = compute_baselines(labels, '{metric}', 'text_classification')
+print(json.dumps(baselines, default=str))
+"
+```
+
+**If domain == "ft":**
+
+```bash
+cd .ml && python -c "
+import json
+from transformers import AutoTokenizer
+from gsd_ml.baselines.finetuning import compute_baselines
+
+tokenizer = AutoTokenizer.from_pretrained('{model_name}')
+vocab_size = tokenizer.vocab_size
+baselines = compute_baselines('{metric}', vocab_size)
 print(json.dumps(baselines, default=str))
 "
 ```
@@ -192,6 +553,8 @@ Try 3 diverse model families to find the best starting point for iteration. Each
 
 1. Get available families from config:
 
+**If domain == "tabular":**
+
 ```bash
 python -c "
 from gsd_ml.drafts import get_families_for_domain
@@ -205,8 +568,48 @@ print(json.dumps(selected))
 "
 ```
 
-2. For each family (e.g., linear, random_forest, xgboost):
+**If domain == "dl":**
+
+```bash
+python -c "
+from gsd_ml.drafts import get_families_for_domain
+import json
+
+config = json.loads(open('.ml/config.json').read())
+draft_families = config.get('draft_families', ['resnet', 'vit', 'efficientnet'])
+families = get_families_for_domain('deeplearning')
+selected = {k: v for k, v in families.items() if k in draft_families}
+print(json.dumps(selected))
+"
+```
+
+**If domain == "ft":**
+
+```bash
+python -c "
+from gsd_ml.drafts import get_families_for_domain
+import json
+
+config = json.loads(open('.ml/config.json').read())
+draft_families = config.get('draft_families', ['qlora_r8', 'qlora_r16', 'qlora_r32'])
+families = get_families_for_domain('finetuning')
+selected = {k: v for k, v in families.items() if k in draft_families}
+print(json.dumps(selected))
+"
+```
+
+2. For each family:
+
+   **If domain == "tabular":** (e.g., linear, random_forest, xgboost)
    - Edit `.ml/train.py` to use that family's model class (e.g., LogisticRegression for linear, RandomForestClassifier for random_forest, XGBClassifier for xgboost). Use default hyperparameters.
+
+   **If domain == "dl":** (e.g., resnet, vit, efficientnet)
+   - Edit `.ml/train.py` to change MODEL_NAME to the family's model. For image_classification: use the timm model name (e.g., `resnet50`, `vit_base_patch16_224`, `efficientnet_b0`). For text_classification: use the HuggingFace model name (e.g., `distilbert-base-uncased`, `bert-base-uncased`, `roberta-base`).
+
+   **If domain == "ft":** (e.g., qlora_r8, qlora_r16, qlora_r32)
+   - Edit `.ml/train.py` to change LORA_R and LORA_ALPHA to match the family configuration (e.g., r=8/alpha=8, r=16/alpha=16, r=32/alpha=32). For `lora_full`, also remove quantization config.
+
+   Then for all domains:
    - Run `cd .ml && python train.py 2>.ml/train.log`
    - Parse the JSON metric from stdout
    - If the run succeeded, commit: `git add .ml/ && git commit -m "draft: {family} {metric}={value}"`
@@ -327,10 +730,27 @@ Use these insights to guide what you change -- e.g., if certain classes are conf
 Read the current `.ml/train.py` using the Read tool.
 
 Edit it to try a different approach. Guidance for each iteration:
+
+**If domain == "tabular":**
 - Try different model families: RandomForest, XGBoost, LightGBM, Ridge/LogisticRegression, GradientBoosting, ExtraTrees, SVM
 - Try different hyperparameters: n_estimators, max_depth, learning_rate, regularization
 - Try feature engineering: polynomial features, interaction terms, binning, feature selection
 - Each iteration should be meaningfully different from previous attempts
+
+**If domain == "dl":**
+- Try different model architectures: for image try different timm models (resnet18/34/50/101, vit_small/base, efficientnet_b0-b4, convnext_tiny/small); for text try different HuggingFace models (distilbert, bert, roberta, albert)
+- Try different learning rates: 1e-3, 5e-4, 1e-4, 3e-5
+- Try different augmentation strategies (image): RandomCrop, ColorJitter, MixUp, CutMix
+- Try different schedulers: CosineAnnealingLR, OneCycleLR, StepLR
+- Try different batch sizes and image sizes
+
+**If domain == "ft":**
+- Try different LoRA configurations: r=8/16/32/64, alpha=8/16/32/64
+- Try different learning rates: 2e-4, 1e-4, 5e-5, 3e-5
+- Try different batch sizes: 1, 2, 4, 8 (with gradient accumulation)
+- Try different number of epochs: 1, 2, 3, 5
+- Try different max_length: 256, 512, 1024, 2048
+- Try different target_modules: "all-linear", specific layer names
 
 **IMPORTANT:** Only edit `.ml/train.py`. NEVER edit `.ml/prepare.py`.
 
@@ -390,11 +810,47 @@ Handle the decision:
 
 After the DeviationHandler returns "keep", check whether the metric also beats baselines:
 
+**If domain == "tabular":**
+
 ```bash
 python -c "
 import json
 from pathlib import Path
 from gsd_ml.baselines.tabular import passes_baseline_gate
+
+config = json.loads(Path('.ml/config.json').read_text())
+baselines = config.get('baselines', {})
+if baselines and not passes_baseline_gate({metric_value}, baselines, '{direction}'):
+    print('BASELINE_GATE_FAIL')
+else:
+    print('BASELINE_GATE_PASS')
+"
+```
+
+**If domain == "dl":**
+
+```bash
+python -c "
+import json
+from pathlib import Path
+from gsd_ml.baselines.deeplearning import passes_baseline_gate
+
+config = json.loads(Path('.ml/config.json').read_text())
+baselines = config.get('baselines', {})
+if baselines and not passes_baseline_gate({metric_value}, baselines, '{direction}'):
+    print('BASELINE_GATE_FAIL')
+else:
+    print('BASELINE_GATE_PASS')
+"
+```
+
+**If domain == "ft":**
+
+```bash
+python -c "
+import json
+from pathlib import Path
+from gsd_ml.baselines.finetuning import passes_baseline_gate
 
 config = json.loads(Path('.ml/config.json').read_text())
 baselines = config.get('baselines', {})
@@ -431,9 +887,9 @@ If the baseline gate passes (or no baselines exist), proceed with the keep:
 **If "retry":**
 - The run failed due to OOM (Out of Memory)
 - Edit train.py to reduce resource usage:
-  - Reduce n_estimators, max_depth, or batch_size
-  - Use a simpler model
-  - Reduce dataset size with sampling
+  - **If domain == "tabular":** Reduce n_estimators, max_depth, or batch_size. Use a simpler model. Reduce dataset size with sampling.
+  - **If domain == "dl":** Reduce batch_size, use a smaller model (e.g. resnet18 instead of resnet50), reduce img_size, disable mixed precision.
+  - **If domain == "ft":** Reduce batch_size, increase gradient_accumulation_steps, reduce max_length, reduce lora_r, use more aggressive quantization.
 - Re-run train.py (go back to Step 3.3)
 - Track retry count; DeviationHandler will return "stop" after 3 retries
 
@@ -445,6 +901,12 @@ If the baseline gate passes (or no baselines exist), proceed with the keep:
 #### Step 3.5a: Run Diagnostics
 
 After each experiment (regardless of keep/revert), if `.ml/predictions.csv` exists, run diagnostics:
+
+**If domain == "ft" and metric in ("perplexity", "loss"):**
+
+Skip diagnostics -- for FT with loss/perplexity metrics, predictions.csv contains per-sample losses (y_true=0.0, y_pred=loss_value) which are not meaningful for the diagnostics engine. Print: "Skipping diagnostics for FT loss/perplexity metric."
+
+**Otherwise (tabular, DL, or FT with ROUGE metrics):**
 
 ```bash
 python -c "
@@ -459,7 +921,7 @@ else:
     preds = pd.read_csv(preds_path)
     config = json.loads(Path('.ml/config.json').read_text())
     task = config['task']
-    if task == 'classification':
+    if task in ('classification', 'image_classification', 'text_classification'):
         diag = diagnose_classification(preds['y_true'].values, preds['y_pred'].values)
     else:
         diag = diagnose_regression(preds['y_true'].values, preds['y_pred'].values)
@@ -492,9 +954,13 @@ state = SessionState(
 
 config = json.loads(open('.ml/config.json').read())
 threshold = config.get('stagnation_threshold', 3)
+domain = config.get('domain', 'tabular')
+
+# Map domain to drafts domain name
+drafts_domain = {'tabular': 'tabular', 'dl': 'deeplearning', 'ft': 'finetuning'}.get(domain, 'tabular')
 
 if check_stagnation(state, threshold):
-    families = get_families_for_domain('tabular')
+    families = get_families_for_domain(drafts_domain)
     untried = [f for f in families if f not in state.tried_families]
     if untried:
         print(json.dumps({'stagnated': True, 'new_family': untried[0], 'all_exhausted': False}))
@@ -663,6 +1129,11 @@ else:
 "
 ```
 
+**Domain-specific export notes:**
+- **Tabular:** The artifact is the best sklearn/xgboost/lightgbm model (saved as pickle or joblib).
+- **DL:** The artifact is `best_model.pt` (PyTorch state_dict). The export copies this to `artifacts/`.
+- **FT:** The artifact is the `best_adapter/` directory (LoRA adapter weights + tokenizer config). The export copies this entire directory to `artifacts/`.
+
 If no experiments succeeded (best_metric is None), skip export and note it in the retrospective.
 
 ### Step 4.2: Generate Retrospective
@@ -716,6 +1187,7 @@ Display final results:
 ```
 === ML Run Complete ===
 Run ID:       {run_id}
+Domain:       {domain}
 Experiments:  {experiment_count}
 Keeps:        {keep_count}
 Reverts:      {revert_count}
@@ -757,3 +1229,5 @@ These rules apply throughout the entire workflow:
 8. **State files** -- checkpoint.json, results.jsonl, and experiments.jsonl are the source of truth. They must be committed with keeps and never reverted.
 
 9. **Stagnation state files** -- Before branching on stagnation, save results.jsonl, experiments.jsonl, checkpoint.json, and diagnostics.json. After creating the explore branch, restore these files. The explore branch starts from best-ever train.py but keeps the full experiment history.
+
+10. **Domain routing** -- For DL/FT domains, the `domain` field in config.json determines which prepare module, template, and baseline module to use. The workflow reads this field to route correctly at every phase.
