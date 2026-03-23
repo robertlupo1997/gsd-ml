@@ -104,7 +104,11 @@ Plans:
   2. README.md documents installation and usage
   3. Error handling covers missing deps, corrupt state, git issues
   4. `npm publish` succeeds and package installable from registry
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — Error handling, python3 standardization, bridge validation, package.json polish
+- [ ] 06-02-PLAN.md — README.md documentation and npm publish verification
 
 ## Progress
 
@@ -115,4 +119,4 @@ Plans:
 | 3. Intelligence | 0/2 | Planned | - |
 | 4. DL + FT | 2/2 | Complete   | 2026-03-23 |
 | 5. Supporting Skills | 1/2 | In Progress|  |
-| 6. Polish | 0/TBD | Not started | - |
+| 6. Polish | 0/2 | Planned | - |
