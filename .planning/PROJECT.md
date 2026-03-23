@@ -40,6 +40,13 @@ Claude Code autonomously runs structured ML experiments with full guardrails, gi
 - Building LLMs from scratch -- fine-tuning existing models only
 - Replacing GSD -- gsd-ml is a domain-specific companion, not a fork
 
+## Current State
+
+**v1.0 shipped** 2026-03-23. Published as `gsd-ml@0.1.0` on npm.
+- 2,057 LOC Python (17 modules), 2,082 LOC tests (188 passing), 2,927 LOC workflows/skills/templates
+- 3 ML domains: tabular (sklearn/XGBoost/LightGBM), deep learning (timm/transformers), fine-tuning (LoRA/QLoRA)
+- 5 skills: `/gsd:ml`, `/gsd:ml-status`, `/gsd:ml-resume`, `/gsd:ml-clean`, `/gsd:ml-diagnose`
+
 ## Context
 
 **Predecessor:** mlforge (github.com/robertlupo1997/mlforge) proved autonomous ML experimentation works with 609 tests across 3 domains. But it spawns `claude -p` subprocesses -- double billing, JSON IPC overhead, no context continuity.
@@ -69,10 +76,10 @@ Claude Code autonomously runs structured ML experiments with full guardrails, gi
 | JSON config (not TOML) | Native JS parsing, Claude Code can read/write directly, simpler | Validated Phase 2 |
 | train.py outputs JSON to stdout | Simplest metric contract between training script and Claude Code | Validated Phase 2 |
 | Git branch per run, commit per keep | Proven pattern from mlforge; atomic state management | Validated Phase 2 |
-| Drop swarm mode for v1 | Subprocess-based parallelism doesn't translate; redesign later if needed | -- Pending |
+| Drop swarm mode for v1 | Subprocess-based parallelism doesn't translate; redesign later if needed | Validated v1.0 |
 | No Optuna | Claude Code iterates manually; HPO framework unnecessary | Validated Phase 2 |
 | __PLACEHOLDER__ constants | Static template with string replacement instead of Jinja2 | Validated Phase 2 |
 | Guardrails read start_time from config.json | Survives context resets unlike in-memory timers | Validated Phase 2 |
 
 ---
-*Last updated: 2026-03-23 after Phase 5 (Supporting Skills)*
+*Last updated: 2026-03-23 after v1.0 milestone*
