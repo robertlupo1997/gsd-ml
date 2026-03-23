@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 02-03-PLAN.md
-last_updated: "2026-03-23T00:09:27.532Z"
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-03-23T00:31:11.912Z"
 progress:
   total_phases: 6
   completed_phases: 2
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 7
+  completed_plans: 6
 ---
 
 ## Project Reference
@@ -34,6 +34,8 @@ See: .planning/PROJECT.md (updated 2026-03-22)
 - [Phase 02]: Unified classification and regression in single template with TASK constant
 - [Phase 02]: Used __PLACEHOLDER__ constants instead of Jinja2 variables
 - [Phase 02]: Guardrails read start_time from config.json to survive context resets
+- [Phase 03]: Baseline gate is workflow-level concern, not inside DeviationHandler
+- [Phase 03]: Diagnostics are ephemeral (overwritten each iteration, not checkpointed)
 
 ## Performance Metrics
 
@@ -44,11 +46,12 @@ See: .planning/PROJECT.md (updated 2026-03-22)
 | Phase 02 P01 | 2min | 2 tasks | 3 files |
 | Phase 02 P02 | 2min | 1 tasks | 1 files |
 | Phase 02 P03 | 2min | 2 tasks | 1 files |
+| Phase 03 P01 | 2min | 2 tasks | 1 files |
 
 ## Session History
 
-**Last session:** 2026-03-23T00:05:50.834Z
-**Stopped at:** Completed 02-03-PLAN.md
+**Last session:** 2026-03-23T00:31:11.909Z
+**Stopped at:** Completed 03-01-PLAN.md
 
 ### 2026-03-22 — Phase 1 complete
 - All 17 Python modules ported from mlforge to gsd_ml
