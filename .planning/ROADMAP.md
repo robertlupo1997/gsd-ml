@@ -59,7 +59,11 @@ Plans:
   2. Diagnostics run after each experiment; results injected into next iteration
   3. Stagnation detected after N reverts; triggers branch to new model family
   4. Multi-draft phase (when enabled) explores diverse initial solutions
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Baselines persistence, baseline gate, diagnostics injection
+- [ ] 03-02-PLAN.md — Multi-draft exploration, stagnation detection and branching
 
 ### Phase 4: DL + Fine-Tuning
 **Goal**: Deep learning and fine-tuning domains work end-to-end
@@ -100,7 +104,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete | 2026-03-22 |
 | 2. Core Workflow | 0/3 | Planned | - |
-| 3. Intelligence | 0/TBD | Not started | - |
+| 3. Intelligence | 0/2 | Planned | - |
 | 4. DL + FT | 0/TBD | Not started | - |
 | 5. Supporting Skills | 0/TBD | Not started | - |
 | 6. Polish | 0/TBD | Not started | - |
