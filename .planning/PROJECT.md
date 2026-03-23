@@ -22,14 +22,14 @@ Claude Code autonomously runs structured ML experiments with full guardrails, gi
 - ✓ Stagnation detection branches to new model family after N consecutive reverts — Phase 3
 - ✓ Deep learning domain works (PyTorch, timm, transformers) — Phase 4
 - ✓ Fine-tuning domain works (peft, trl, LoRA, QLoRA) — Phase 4
+- ✓ Checkpoint/resume survives context resets and session restarts — Phase 5
+- ✓ `/gsd:ml-status` shows past experiment runs — Phase 5
+- ✓ `/gsd:ml-resume` resumes an interrupted experiment — Phase 5
+- ✓ `/gsd:ml-clean` removes old experiment artifacts — Phase 5
 - ✓ npm package installs skills, workflows, references, templates into ~/.claude/ — Phase 1
 - ✓ Python utilities installable via pip/uv for ML-specific operations — Phase 1
 
 ### Active
-- [ ] Checkpoint/resume survives context resets and session restarts
-- [ ] `/gsd:ml-status` shows past experiment runs
-- [ ] `/gsd:ml-resume` resumes an interrupted experiment
-- [ ] `/gsd:ml-clean` removes old experiment artifacts
 
 ### Out of Scope
 
@@ -75,4 +75,4 @@ Claude Code autonomously runs structured ML experiments with full guardrails, gi
 | Guardrails read start_time from config.json | Survives context resets unlike in-memory timers | Validated Phase 2 |
 
 ---
-*Last updated: 2026-03-23 after Phase 4 (DL + Fine-Tuning)*
+*Last updated: 2026-03-23 after Phase 5 (Supporting Skills)*
