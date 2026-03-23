@@ -9,7 +9,7 @@ Build gsd-ml as a Claude Code native ML research tool following GSD patterns. St
 - [x] **Phase 1: Foundation** - npm package skeleton + Python utilities ported from mlforge (2026-03-22)
 - [ ] **Phase 2: Core Workflow** - End-to-end tabular experiment loop via Claude Code
 - [ ] **Phase 3: Intelligence Layer** - Diagnostics, stagnation, multi-draft
-- [ ] **Phase 4: DL + Fine-Tuning** - Deep learning and fine-tuning domains
+- [x] **Phase 4: DL + Fine-Tuning** - Deep learning and fine-tuning domains (completed 2026-03-23)
 - [ ] **Phase 5: Supporting Skills** - Resume, status, clean, diagnose
 - [ ] **Phase 6: Polish + Release** - Tests, docs, error handling, npm publish
 
@@ -74,7 +74,7 @@ Plans:
   2. `/gsd:ml data.jsonl target --domain ft --model-name meta-llama/Llama-3-8B` runs fine-tuning
   3. Domain-specific baselines computed for DL and FT
   4. GPU auto-detected and surfaced for DL/FT domains
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 04-01-PLAN.md — DL/FT templates, baseline gates, metric map, tests
@@ -109,6 +109,6 @@ Plans:
 | 1. Foundation | 2/2 | Complete | 2026-03-22 |
 | 2. Core Workflow | 0/3 | Planned | - |
 | 3. Intelligence | 0/2 | Planned | - |
-| 4. DL + FT | 0/2 | Planned | - |
+| 4. DL + FT | 2/2 | Complete   | 2026-03-23 |
 | 5. Supporting Skills | 0/TBD | Not started | - |
 | 6. Polish | 0/TBD | Not started | - |

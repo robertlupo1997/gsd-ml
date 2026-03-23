@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-03-23T01:02:01.630Z"
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-03-23T01:08:19.871Z"
 progress:
   total_phases: 6
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 9
-  completed_plans: 8
+  completed_plans: 9
 ---
 
 ## Project Reference
@@ -41,6 +41,8 @@ See: .planning/PROJECT.md (updated 2026-03-22)
 - [Phase 03]: All-families-exhausted resets consecutive_reverts and continues with hyperparameter variations
 - [Phase 04]: Used processing_class=tokenizer instead of deprecated tokenizer= param in SFTTrainer
 - [Phase 04]: Split DL into separate image and text templates instead of one with conditionals
+- [Phase 04]: Inline domain conditionals in single workflow file rather than separate per-domain workflows
+- [Phase 04]: Skip diagnostics for FT with loss/perplexity metrics
 
 ## Performance Metrics
 
@@ -54,11 +56,12 @@ See: .planning/PROJECT.md (updated 2026-03-22)
 | Phase 03 P01 | 2min | 2 tasks | 1 files |
 | Phase 03 P02 | 2min | 2 tasks | 1 files |
 | Phase 04 P01 | 3min | 2 tasks | 8 files |
+| Phase 04 P02 | 4min | 1 tasks | 1 files |
 
 ## Session History
 
-**Last session:** 2026-03-23T01:02:01.626Z
-**Stopped at:** Completed 04-01-PLAN.md
+**Last session:** 2026-03-23T01:08:19.855Z
+**Stopped at:** Completed 04-02-PLAN.md
 
 ### 2026-03-22 — Phase 1 complete
 - All 17 Python modules ported from mlforge to gsd_ml
