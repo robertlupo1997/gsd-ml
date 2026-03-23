@@ -230,6 +230,12 @@ Check all guardrails before starting each experiment:
 
 #### Step 3.2: Edit train.py
 
+Before editing train.py, check if `.ml/diagnostics.json` exists from the previous iteration. If it does, read it and use the findings to inform your edits:
+- For classification: check `confused_pairs` (which classes are being confused), `per_class_accuracy` (which classes are underperforming), `bias` (over/under-predicting certain classes)
+- For regression: check `worst_predictions` (which samples have highest error), `bias` (systematic over/under-prediction), `error_stats` (error distribution)
+
+Use these insights to guide what you change -- e.g., if certain classes are confused, try features that distinguish them; if there's high bias, try a more expressive model.
+
 Read the current `.ml/train.py` using the Read tool.
 
 Edit it to try a different approach. Guidance for each iteration:
@@ -346,7 +352,35 @@ If the baseline gate passes (or no baselines exist), proceed with the keep:
 - Print the reason and break the experiment loop
 - This is a graceful stop, not an error
 
-#### Step 3.5: Record Results
+#### Step 3.5a: Run Diagnostics
+
+After each experiment (regardless of keep/revert), if `.ml/predictions.csv` exists, run diagnostics:
+
+```bash
+python -c "
+import json, pandas as pd
+from pathlib import Path
+from gsd_ml.diagnostics import diagnose_regression, diagnose_classification
+
+preds_path = Path('.ml/predictions.csv')
+if not preds_path.exists():
+    print('No predictions.csv found, skipping diagnostics')
+else:
+    preds = pd.read_csv(preds_path)
+    config = json.loads(Path('.ml/config.json').read_text())
+    task = config['task']
+    if task == 'classification':
+        diag = diagnose_classification(preds['y_true'].values, preds['y_pred'].values)
+    else:
+        diag = diagnose_regression(preds['y_true'].values, preds['y_pred'].values)
+    Path('.ml/diagnostics.json').write_text(json.dumps(diag, indent=2, default=str))
+    print(json.dumps(diag, default=str))
+"
+```
+
+Display the diagnostics summary. Note: `diagnostics.json` is ephemeral (overwritten each iteration), NOT saved in checkpoint.
+
+#### Step 3.5b: Record Results
 
 After each experiment (regardless of keep/revert decision), record:
 
