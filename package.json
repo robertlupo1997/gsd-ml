@@ -25,5 +25,9 @@
   },
   "engines": {
     "node": ">=16.7.0"
+  },
+  "homepage": "https://github.com/robertlupo1997/gsd-ml#readme",
+  "bugs": {
+    "url": "https://github.com/robertlupo1997/gsd-ml/issues"
   }
 }
