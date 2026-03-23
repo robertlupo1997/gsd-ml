@@ -1,0 +1,137 @@
+# ML Clean Workflow
+> Removes experiment state from .ml/ directory and optionally cleans git branches/tags.
+> Called by /gsd:ml-clean skill. Do not run directly.
+
+---
+
+## Step 1: Validate Experiment Directory
+
+Check for `.ml/` directory:
+
+```bash
+test -d .ml/ || echo "NO_ML_DIR"
+```
+
+If `.ml/` does not exist, print:
+
+```
+No experiment directory found.
+```
+
+Then STOP. Do not proceed.
+
+---
+
+## Step 2: Preview
+
+Show what will be removed.
+
+### 2a: Directory Size and File Count
+
+```bash
+du -sh .ml/
+find .ml/ -type f | wc -l
+```
+
+Print:
+
+```
+Experiment directory: .ml/
+Size: {size}
+Files: {count}
+```
+
+### 2b: Git Branches and Tags (--branches flag only)
+
+If the user passed `--branches`, also show:
+
+```bash
+git branch --list 'ml/run-*'
+git tag --list 'ml-best-*'
+```
+
+Print the branch and tag lists. If none exist, print "No ml/ branches or tags found."
+
+---
+
+## Step 3: Artifact Preservation
+
+Check if `.ml/artifacts/` exists and contains files:
+
+```bash
+test -d .ml/artifacts/ && find .ml/artifacts/ -type f | head -5
+```
+
+If artifacts exist, ask the user:
+
+```
+Best model artifacts found in .ml/artifacts/. Copy to ./model/ before cleaning? (y/n)
+```
+
+If the user confirms (y), copy artifacts:
+
+```bash
+mkdir -p model && cp -r .ml/artifacts/* model/
+```
+
+Print: "Artifacts copied to ./model/"
+
+If the user declines (n) or no artifacts exist, skip this step.
+
+---
+
+## Step 4: Confirm
+
+Unless the `--force` flag was passed, ask the user for confirmation:
+
+```
+Remove all experiment state? This will delete .ml/ and cannot be undone. (y/n)
+```
+
+Wait for the user's response. If they decline (n), print "Clean cancelled." and STOP.
+
+If `--force` was passed, skip confirmation and proceed directly.
+
+---
+
+## Step 5: Delete
+
+### 5a: Remove Experiment Directory
+
+```bash
+rm -rf .ml/
+```
+
+### 5b: Remove Git Branches and Tags (--branches flag only)
+
+If `--branches` was passed, delete each branch and tag:
+
+```bash
+# Delete branches
+for branch in $(git branch --list 'ml/run-*' | tr -d ' *'); do
+    git branch -D "$branch" 2>/dev/null && echo "Deleted branch: $branch"
+done
+
+# Delete tags
+for tag in $(git tag --list 'ml-best-*'); do
+    git tag -d "$tag" 2>/dev/null && echo "Deleted tag: $tag"
+done
+```
+
+### 5c: Summary
+
+Print what was removed:
+
+```
+Cleaned:
+  - Removed .ml/ directory ({size}, {count} files)
+  - Deleted {n} branches, {m} tags  (if --branches)
+```
+
+---
+
+## Notes
+
+- This is a destructive operation. Always preview first, always confirm (unless --force).
+- Artifact preservation is offered before any deletion.
+- Branch/tag deletion only happens with explicit --branches flag.
