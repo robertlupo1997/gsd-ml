@@ -89,7 +89,11 @@ Plans:
   2. `/gsd:ml-resume` loads checkpoint and continues experiment loop
   3. `/gsd:ml-clean` removes .ml/ directories and orphaned git branches
   4. `/gsd:ml-diagnose` runs diagnostics on current model without entering loop
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 05-01-PLAN.md — Status, clean, and diagnose skills and workflows
+- [ ] 05-02-PLAN.md — Resume skill and workflow (checkpoint restore + loop re-entry)
 
 ### Phase 6: Polish + Release
 **Goal**: Production-ready npm package published
@@ -110,5 +114,5 @@ Plans:
 | 2. Core Workflow | 0/3 | Planned | - |
 | 3. Intelligence | 0/2 | Planned | - |
 | 4. DL + FT | 2/2 | Complete   | 2026-03-23 |
-| 5. Supporting Skills | 0/TBD | Not started | - |
+| 5. Supporting Skills | 0/2 | Planned | - |
 | 6. Polish | 0/TBD | Not started | - |
