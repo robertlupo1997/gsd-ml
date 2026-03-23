@@ -166,6 +166,18 @@ print(json.dumps(baselines, default=str))
 "
 ```
 
+Persist baselines into config.json so they survive context resets:
+
+```bash
+python -c "
+import json
+from pathlib import Path
+config = json.loads(Path('.ml/config.json').read_text())
+config['baselines'] = baselines
+Path('.ml/config.json').write_text(json.dumps(config, indent=2))
+"
+```
+
 Display baseline results. These are the minimum performance thresholds the model must beat.
 
 ### Step 2.8: Create Git Branch
@@ -280,7 +292,29 @@ print(json.dumps({'decision': decision}))
 
 Handle the decision:
 
-**If "keep":**
+**If "keep" -- apply baseline gate:**
+
+After the DeviationHandler returns "keep", check whether the metric also beats baselines:
+
+```bash
+python -c "
+import json
+from pathlib import Path
+from gsd_ml.baselines.tabular import passes_baseline_gate
+
+config = json.loads(Path('.ml/config.json').read_text())
+baselines = config.get('baselines', {})
+if baselines and not passes_baseline_gate({metric_value}, baselines, '{direction}'):
+    print('BASELINE_GATE_FAIL')
+else:
+    print('BASELINE_GATE_PASS')
+"
+```
+
+If the baseline gate fails (output is `BASELINE_GATE_FAIL`), downgrade the decision to "revert". Log the reason: "Reverted: metric {value} does not beat baselines."
+
+If the baseline gate passes (or no baselines exist), proceed with the keep:
+
 - Update `best_metric = metric_value`
 - Update `best_experiment = experiment_count + 1`
 - Commit the improvement:
@@ -364,9 +398,11 @@ Path('.ml/experiments.md').write_text(md)
 
 ```bash
 python -c "
+import json
 from pathlib import Path
 from gsd_ml.state import SessionState
 from gsd_ml.checkpoint import save_checkpoint
+config = json.loads(Path('.ml/config.json').read_text())
 state = SessionState(
     run_id='{run_id}',
     experiment_count={N},
@@ -374,7 +410,8 @@ state = SessionState(
     total_reverts={reverts},
     best_metric={best_metric_or_None},
     best_commit='{best_commit_or_empty}',
-    task='{task}'
+    task='{task}',
+    baselines=config.get('baselines')
 )
 save_checkpoint(state, Path('.ml'))
 "
