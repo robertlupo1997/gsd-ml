@@ -39,6 +39,14 @@ In Claude Code, run:
 
 This profiles your dataset, scaffolds a `.ml/` experiment directory, runs iterative training with automatic keep/revert decisions, and exports the best model.
 
+For other domains:
+
+```
+/gsd:ml images/ --domain dl --task image_classification
+/gsd:ml data.csv target --domain dl --task text_classification
+/gsd:ml data.jsonl --domain ft --model-name meta-llama/Llama-3-8B
+```
+
 ## Domains
 
 | Domain | Command | Models |
@@ -47,6 +55,8 @@ This profiles your dataset, scaffolds a `.ml/` experiment directory, runs iterat
 | DL Image | `/gsd:ml images/ --domain dl --task image_classification` | timm (ResNet, EfficientNet, ...) |
 | DL Text | `/gsd:ml data.csv target --domain dl --task text_classification` | transformers |
 | Fine-Tuning | `/gsd:ml data.jsonl --domain ft --model-name meta-llama/...` | peft, trl (LoRA/QLoRA) |
+
+> DL and FT domains check for GPU availability at startup. CPU-only machines get a warning but can still run experiments (slowly).
 
 ## Skills
 
@@ -66,13 +76,15 @@ Skill (/gsd:ml) -> Workflow (ml-run.md) -> Claude Code executes with native tool
 
 1. **Skills** (`~/.claude/commands/gsd-ml/`) are Claude Code slash commands with YAML frontmatter
 2. **Workflows** (`~/.claude/gsd-ml/workflows/`) are step-by-step markdown instructions that Claude Code follows
-3. Claude Code reads/writes files, runs training via Bash, parses metrics, and manages experiment state through git
+3. **Templates** (`~/.claude/gsd-ml/templates/`) provide starter train.py files for each domain (tabular, DL image, DL text, fine-tuning)
+4. **References** (`~/.claude/gsd-ml/references/`) are lookup tables (e.g., metric-map.md maps metrics to sklearn scoring strings)
+5. Claude Code reads/writes files, runs training via Bash, parses metrics, and manages experiment state through git
 
 Experiment state lives in `.ml/`:
-- `config.json` -- experiment configuration (domain, target, metric, iterations)
-- `checkpoint.json` -- current progress (iteration, best score, model path)
-- `results.csv` -- metric history across iterations
-- `journal.jsonl` -- detailed log of each iteration's changes and outcomes
+- `config.json` -- experiment configuration (domain, target, metric, guardrails)
+- `checkpoint.json` -- current progress (iteration, best score, keeps/reverts)
+- `results.jsonl` -- metric history across iterations
+- `experiments.md` -- human-readable journal of each iteration
 
 ## From mlforge
 
