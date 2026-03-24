@@ -573,9 +573,7 @@ Try 3 diverse model families to find the best starting point for iteration. Each
 
 **Sub-steps:**
 
-1. Get available families from config:
-
-**If domain == "tabular":**
+1. Get available families from config (domain-agnostic):
 
 ```bash
 python3 -c "
@@ -583,38 +581,9 @@ from gsd_ml.drafts import get_families_for_domain
 import json
 
 config = json.loads(open('.ml/config.json').read())
-draft_families = config.get('draft_families', ['linear', 'random_forest', 'xgboost'])
-families = get_families_for_domain('tabular')
-selected = {k: v for k, v in families.items() if k in draft_families}
-print(json.dumps(selected))
-"
-```
-
-**If domain == "dl":**
-
-```bash
-python3 -c "
-from gsd_ml.drafts import get_families_for_domain
-import json
-
-config = json.loads(open('.ml/config.json').read())
-draft_families = config.get('draft_families', ['resnet', 'vit', 'efficientnet'])
-families = get_families_for_domain('deeplearning')
-selected = {k: v for k, v in families.items() if k in draft_families}
-print(json.dumps(selected))
-"
-```
-
-**If domain == "ft":**
-
-```bash
-python3 -c "
-from gsd_ml.drafts import get_families_for_domain
-import json
-
-config = json.loads(open('.ml/config.json').read())
-draft_families = config.get('draft_families', ['qlora_r8', 'qlora_r16', 'qlora_r32'])
-families = get_families_for_domain('finetuning')
+draft_families = config.get('draft_families', [])
+domain_map = {'tabular': 'tabular', 'dl': 'deeplearning', 'ft': 'finetuning'}
+families = get_families_for_domain(domain_map[config['domain']])
 selected = {k: v for k, v in families.items() if k in draft_families}
 print(json.dumps(selected))
 "
@@ -832,54 +801,26 @@ Handle the decision:
 
 After the DeviationHandler returns "keep", check whether the metric also beats baselines:
 
-**If domain == "tabular":**
+The `passes_baseline_gate` function has the same signature across all domains. Use the domain from config to select the correct import:
 
 ```bash
 python3 -c "
-import json
+import json, importlib
 from pathlib import Path
-from gsd_ml.baselines.tabular import passes_baseline_gate
 
 config = json.loads(Path('.ml/config.json').read_text())
 baselines = config.get('baselines', {})
-if baselines and not passes_baseline_gate({metric_value}, baselines, '{direction}'):
-    print('BASELINE_GATE_FAIL')
-else:
+domain = config['domain']
+
+if not baselines:
     print('BASELINE_GATE_PASS')
-"
-```
-
-**If domain == "dl":**
-
-```bash
-python3 -c "
-import json
-from pathlib import Path
-from gsd_ml.baselines.deeplearning import passes_baseline_gate
-
-config = json.loads(Path('.ml/config.json').read_text())
-baselines = config.get('baselines', {})
-if baselines and not passes_baseline_gate({metric_value}, baselines, '{direction}'):
-    print('BASELINE_GATE_FAIL')
 else:
-    print('BASELINE_GATE_PASS')
-"
-```
-
-**If domain == "ft":**
-
-```bash
-python3 -c "
-import json
-from pathlib import Path
-from gsd_ml.baselines.finetuning import passes_baseline_gate
-
-config = json.loads(Path('.ml/config.json').read_text())
-baselines = config.get('baselines', {})
-if baselines and not passes_baseline_gate({metric_value}, baselines, '{direction}'):
-    print('BASELINE_GATE_FAIL')
-else:
-    print('BASELINE_GATE_PASS')
+    module_map = {'tabular': 'tabular', 'dl': 'deeplearning', 'ft': 'finetuning'}
+    mod = importlib.import_module(f'gsd_ml.baselines.{module_map[domain]}')
+    if mod.passes_baseline_gate({metric_value}, baselines, '{direction}'):
+        print('BASELINE_GATE_PASS')
+    else:
+        print('BASELINE_GATE_FAIL')
 "
 ```
 

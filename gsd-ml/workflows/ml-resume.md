@@ -120,9 +120,10 @@ with open('.ml/config.json') as f:
     config = json.load(f)
 
 guardrails = ResourceGuardrails(config, Path('.ml'))
+# Use checkpoint values from Step 2 (not config)
 state = SessionState(
-    experiment_count=config.get('experiment_count', 0),
-    run_id=config.get('run_id', '')
+    experiment_count={experiment_count},
+    run_id='{run_id}'
 )
 stop = guardrails.should_stop(state)
 reason = guardrails.stop_reason(state) if stop else None

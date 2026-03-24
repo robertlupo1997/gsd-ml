@@ -4,7 +4,7 @@
 
 ---
 
-## Pre-flight Checks
+## Step 1: Pre-flight and State Validation
 
 Verify the Python package is available:
 
@@ -15,22 +15,7 @@ python3 -c "import gsd_ml; print('OK')" 2>&1
 If this fails (ModuleNotFoundError), STOP and tell the user:
 > gsd_ml Python package is not installed. Install with: `pip install gsd-ml` (from PyPI) or `pip install ./python` (from repo)
 
-Verify `.ml/` directory and checkpoint exist:
-
-```bash
-test -d .ml/ && test -f .ml/checkpoint.json && echo "OK" || echo "MISSING"
-```
-
-If either is missing, print:
-> No experiment data found. Run /gsd:ml first to create an experiment.
-
-Then STOP. Do not proceed.
-
----
-
-## Step 1: Validate State
-
-Check for `.ml/` directory and load checkpoint:
+Load `.ml/` checkpoint and validate:
 
 ```bash
 python3 -c "

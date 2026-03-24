@@ -4,7 +4,7 @@
 
 ---
 
-## Pre-flight Checks
+## Pre-flight Check
 
 Verify `.ml/` directory exists:
 
@@ -19,29 +19,11 @@ Then STOP. Do not proceed.
 
 ---
 
-## Step 1: Validate Experiment Directory
-
-Check for `.ml/` directory:
-
-```bash
-test -d .ml/ || echo "NO_ML_DIR"
-```
-
-If `.ml/` does not exist, print:
-
-```
-No experiment directory found.
-```
-
-Then STOP. Do not proceed.
-
----
-
-## Step 2: Preview
+## Step 1: Preview
 
 Show what will be removed.
 
-### 2a: Directory Size and File Count
+### 1a: Directory Size and File Count
 
 ```bash
 du -sh .ml/
@@ -56,7 +38,7 @@ Size: {size}
 Files: {count}
 ```
 
-### 2b: Git Branches and Tags (--branches flag only)
+### 1b: Git Branches and Tags (--branches flag only)
 
 If the user passed `--branches`, also show:
 
@@ -69,7 +51,7 @@ Print the branch and tag lists. If none exist, print "No ml/ branches or tags fo
 
 ---
 
-## Step 3: Artifact Preservation
+## Step 2: Artifact Preservation
 
 Check if `.ml/artifacts/` exists and contains files:
 
@@ -95,7 +77,7 @@ If the user declines (n) or no artifacts exist, skip this step.
 
 ---
 
-## Step 4: Confirm
+## Step 3: Confirm
 
 Unless the `--force` flag was passed, ask the user for confirmation:
 
@@ -109,15 +91,15 @@ If `--force` was passed, skip confirmation and proceed directly.
 
 ---
 
-## Step 5: Delete
+## Step 4: Delete
 
-### 5a: Remove Experiment Directory
+### 4a: Remove Experiment Directory
 
 ```bash
 rm -rf .ml/
 ```
 
-### 5b: Remove Git Branches and Tags (--branches flag only)
+### 4b: Remove Git Branches and Tags (--branches flag only)
 
 If `--branches` was passed, delete each branch and tag:
 
@@ -133,7 +115,7 @@ for tag in $(git tag --list 'ml-best-*'); do
 done
 ```
 
-### 5c: Summary
+### 4c: Summary
 
 Print what was removed:
 
