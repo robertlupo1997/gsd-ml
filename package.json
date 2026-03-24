@@ -1,6 +1,6 @@
 {
   "name": "gsd-ml",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Claude Code native autonomous ML research tool. Distributed as an npm package following GSD patterns.",
   "bin": {
     "gsd-ml": "bin/install.js"
