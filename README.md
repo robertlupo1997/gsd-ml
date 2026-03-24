@@ -7,7 +7,7 @@ Claude Code native autonomous ML research tool.
 
 ## What is this?
 
-gsd-ml turns Claude Code into an autonomous ML researcher. Instead of spawning subprocesses or double-billing API calls, Claude Code **is** the researcher -- it edits train.py, runs experiments via Bash, parses metrics, and makes keep/revert decisions directly using git. Ships as an npm package that installs skills and workflows into `~/.claude/`, plus a Python utilities package (`gsd_ml`) for data profiling, checkpointing, and diagnostics.
+gsd-ml turns Claude Code into an autonomous ML researcher. Claude Code edits train.py, runs experiments via Bash, parses metrics, and makes keep/revert decisions through git — no subprocesses, no double-billing. Ships as an npm package (skills and workflows into `~/.claude/`) plus a Python utilities package (`gsd_ml`) for data profiling, checkpointing, and diagnostics.
 
 ## Install
 
@@ -56,7 +56,7 @@ For other domains:
 | DL Text | `/gsd:ml data.csv target --domain dl --task text_classification` | transformers |
 | Fine-Tuning | `/gsd:ml data.jsonl --domain ft --model-name meta-llama/...` | peft, trl (LoRA/QLoRA) |
 
-> DL and FT domains check for GPU availability at startup. CPU-only machines get a warning but can still run experiments (slowly).
+> DL and FT domains check for GPU availability at startup. CPU-only machines still work but run slowly.
 
 ## Skills
 
@@ -88,13 +88,13 @@ Experiment state lives in `.ml/`:
 
 ## From mlforge
 
-gsd-ml replaces [mlforge](https://github.com/robertlupo1997/mlforge)'s subprocess-spawning CLI with native Claude Code execution. Same experiment structure, same Python utilities, but Claude Code IS the researcher instead of being spawned as a subprocess.
+gsd-ml replaces [mlforge](https://github.com/robertlupo1997/mlforge)'s subprocess-spawning CLI with native Claude Code execution.
 
 **Migration:**
-- Replace `from mlforge` imports with `from gsd_ml`
+- Replace `from mlforge` with `from gsd_ml`
 - Replace `mlforge` CLI commands with `/gsd:ml` slash commands
-- Experiment directories (`.ml/`) use the same structure
-- All Python utilities (profiler, checkpoint, guardrails, diagnostics, drafts, stagnation) carry over with identical APIs
+- `.ml/` directory structure is unchanged
+- All Python utilities carry over with identical APIs
 
 ## Requirements
 
