@@ -1,6 +1,6 @@
 ---
 name: gsd:ml-clean
-description: Remove experiment state and optionally git branches
+description: Remove .ml/ experiment artifacts and optionally clean up git branches and tags
 argument-hint: "[--branches] [--force]"
 allowed-tools: [Read, Bash, Glob]
 ---

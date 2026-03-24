@@ -1,6 +1,6 @@
 ---
 name: gsd:ml-resume
-description: Resume an experiment from checkpoint
+description: Resume a paused or interrupted ML experiment from its checkpoint
 argument-hint: "[--run <run_id>]"
 allowed-tools: [Read, Write, Edit, Bash, Glob, Grep, Task]
 ---

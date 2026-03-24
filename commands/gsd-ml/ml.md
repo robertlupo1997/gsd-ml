@@ -1,6 +1,6 @@
 ---
 name: gsd:ml
-description: Run an autonomous ML experiment
+description: Run an autonomous ML experiment — profile data, train models, iterate, and export the best result. Supports tabular (sklearn/XGBoost/LightGBM), deep learning (image/text), and fine-tuning (LoRA/QLoRA).
 argument-hint: "<dataset> <target> [--domain tabular|dl|ft] [--task <task_type>] [--model-name <model>]"
 allowed-tools: [Read, Write, Edit, Bash, Glob, Grep, Task]
 ---

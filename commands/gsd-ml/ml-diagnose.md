@@ -1,6 +1,6 @@
 ---
 name: gsd:ml-diagnose
-description: Run diagnostics on the best model from last experiment
+description: Diagnose the best model from the last experiment — worst predictions, bias analysis, and confusion matrix
 argument-hint: ""
 allowed-tools: [Read, Write, Bash, Glob]
 ---

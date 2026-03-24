@@ -1,6 +1,6 @@
 ---
 name: gsd:ml-status
-description: Show experiment run status and metrics
+description: Show experiment run history, metrics, and score trajectory from the .ml/ directory
 argument-hint: "[--detail <run_id>]"
 allowed-tools: [Read, Bash, Glob]
 ---
