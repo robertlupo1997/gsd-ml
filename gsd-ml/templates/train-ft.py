@@ -85,7 +85,7 @@ def evaluate_perplexity(model, tokenizer, eval_data):
             count += 1
 
     avg_loss = total_loss / max(count, 1)
-    perplexity = math.exp(avg_loss)
+    perplexity = math.exp(min(avg_loss, 700))
     return perplexity
 
 
@@ -142,11 +142,10 @@ def main():
         MODEL_NAME,
         quantization_config=quant_config,
         device_map="auto",
-        trust_remote_code=True,
     )
 
     # 3. Load tokenizer
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, trust_remote_code=True)
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
