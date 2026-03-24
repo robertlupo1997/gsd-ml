@@ -108,10 +108,10 @@ def load_image_data(
     num_classes = len(train_dataset.dataset.classes) if hasattr(train_dataset, "dataset") else len(train_dataset.classes)
 
     train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=batch_size, shuffle=True, num_workers=2,
+        train_dataset, batch_size=batch_size, shuffle=True, num_workers=2, pin_memory=True,
     )
     val_loader = torch.utils.data.DataLoader(
-        val_dataset, batch_size=batch_size, shuffle=False, num_workers=2,
+        val_dataset, batch_size=batch_size, shuffle=False, num_workers=2, pin_memory=True,
     )
 
     return train_loader, val_loader, num_classes
@@ -194,10 +194,10 @@ def load_text_data(
     )
 
     train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=batch_size, shuffle=True,
+        train_dataset, batch_size=batch_size, shuffle=True, pin_memory=True,
     )
     val_loader = torch.utils.data.DataLoader(
-        val_dataset, batch_size=batch_size, shuffle=False,
+        val_dataset, batch_size=batch_size, shuffle=False, pin_memory=True,
     )
 
     return train_loader, val_loader, num_labels
