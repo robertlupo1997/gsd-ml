@@ -61,7 +61,10 @@ def split_data(
     """
     X = df.drop(columns=[target_column])
     y = df[target_column]
-    return train_test_split(X, y, test_size=test_size, random_state=random_state)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=test_size, random_state=random_state
+    )
+    return X_train, X_test, y_train, y_test  # type: ignore[reportReturnType]
 
 
 def build_preprocessor(X: pd.DataFrame) -> ColumnTransformer:
@@ -209,7 +212,7 @@ def validate_no_leakage(
         for col in numeric_cols:
             if col == target_column:
                 continue
-            corr = df[col].corr(df[target_column])
+            corr = df[col].corr(df[target_column])  # type: ignore[reportArgumentType]
             if abs(corr) > 0.99:
                 warnings.append(
                     f"Column '{col}' has {corr:.3f} correlation with target -- potential leakage"

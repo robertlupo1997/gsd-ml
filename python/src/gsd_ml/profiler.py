@@ -87,7 +87,7 @@ def profile_dataset(df: pd.DataFrame, target_column: str) -> DatasetProfile:
             f"Target column '{target_column}' not found. "
             f"Available columns: {list(df.columns)}"
         )
-    if df[target_column].isna().all():
+    if df[target_column].isna().all():  # type: ignore[reportGeneralTypeIssues]
         raise ValueError(f"Target column '{target_column}' is entirely NaN")
 
     n_rows = len(df)
@@ -96,7 +96,7 @@ def profile_dataset(df: pd.DataFrame, target_column: str) -> DatasetProfile:
 
     if n_features == 0:
         raise ValueError("Dataset has only one column; need at least a target and one feature")
-    if df[feature_cols].isna().all(axis=None):
+    if df[feature_cols].isna().all(axis=None):  # type: ignore[reportGeneralTypeIssues, reportArgumentType]
         raise ValueError("All feature columns are entirely NaN")
 
     # Feature type detection
