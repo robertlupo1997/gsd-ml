@@ -16,17 +16,16 @@ gsd-ml turns Claude Code into an autonomous ML researcher. Claude Code edits tra
 npm install -g gsd-ml
 gsd-ml                    # copies skills/workflows to ~/.claude/
 
-# 2. Install Python utilities
-pip install gsd-ml        # from PyPI
-# or from repo:
+# 2. Install Python utilities from a clone of this repo
+#    (the Python package is not published on PyPI yet)
 pip install ./python
 ```
 
 Optional extras for deep learning and fine-tuning:
 
 ```bash
-pip install "gsd-ml[dl]"   # torch, timm, transformers
-pip install "gsd-ml[ft]"   # torch, peft, trl, transformers
+pip install "./python[dl]"   # torch, timm, transformers
+pip install "./python[ft]"   # torch, peft, trl, transformers
 ```
 
 ## Quick Start
@@ -94,7 +93,7 @@ gsd-ml replaces [mlforge](https://github.com/robertlupo1997/mlforge)'s subproces
 - Replace `from mlforge` with `from gsd_ml`
 - Replace `mlforge` CLI commands with `/gsd:ml` slash commands
 - `.ml/` directory structure is unchanged
-- All Python utilities carry over with identical APIs
+- Most Python utilities carry over with the same APIs; the mlforge engine and CLI modules were dropped
 
 ## Requirements
 
