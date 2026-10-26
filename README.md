@@ -87,7 +87,7 @@ Experiment state lives in `.ml/`:
 
 ## From mlforge
 
-gsd-ml replaces [mlforge](https://github.com/robertlupo1997/mlforge)'s subprocess-spawning CLI with native Claude Code execution.
+gsd-ml replaces the subprocess-spawning CLI of mlforge, an earlier prototype that is not public, with native Claude Code execution.
 
 **Migration:**
 - Replace `from mlforge` with `from gsd_ml`

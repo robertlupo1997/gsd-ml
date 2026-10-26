@@ -39,7 +39,7 @@ Claude Code native autonomous ML research tool. Published on npm as `gsd-ml`.
 
 ## Predecessor
 
-Redesigned from [mlforge](https://github.com/robertlupo1997/mlforge). Claude Code acts as the researcher directly instead of spawning subprocesses. Dropped: engine.py, cli.py, swarm/, hooks.py, progress.py, plugins.py, Jinja2 templates.
+Redesigned from mlforge (an earlier, private prototype). Claude Code acts as the researcher directly instead of spawning subprocesses. Dropped: engine.py, cli.py, swarm/, hooks.py, progress.py, plugins.py, Jinja2 templates.
 
 ## Planning
 
